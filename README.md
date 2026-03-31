@@ -1,16 +1,34 @@
 # fit_mate_client
 
-A new Flutter project.
+Feature-first + MVVM folder structure starter for the Fit Mate Flutter app.
 
-## Getting Started
+## Project Structure
 
-This project is a starting point for a Flutter application.
+```text
+lib/
+├── core/
+│   ├── constants/
+│   ├── network/
+│   ├── theme/
+│   └── utils/
+├── shared/
+│   └── widgets/
+├── features/
+│   ├── upload/
+│   ├── styling_condition/
+│   ├── recommendation/
+│   └── result/
+└── main.dart
+```
 
-A few resources to get you started if this is your first Flutter project:
+Each feature follows:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```text
+feature/
+├── model/
+├── view/
+├── viewmodel/
+└── widget/
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This PR is intended to establish the initial file layout only.
