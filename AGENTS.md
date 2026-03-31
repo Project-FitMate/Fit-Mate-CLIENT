@@ -44,6 +44,9 @@ feature/
 - Do not invent extra architecture layers unless needed for the request.
 - Prefer minimal, readable starter code over speculative abstractions.
 - Use `ChangeNotifier` for ViewModels unless the user asks for a different state management solution.
+- Build screens responsively for common mobile sizes.
+- Avoid relying on large fixed vertical gaps that can clip bottom actions.
+- Prefer `LayoutBuilder`, flexible sizing, and scrollable layouts when needed.
 
 ## Shared Code Rules
 
@@ -55,6 +58,8 @@ feature/
 
 - Do not work directly on `develop`.
 - Keep commits scoped to one logical change.
+- Create a commit before a change grows too large or spans multiple concerns.
+- Prefer meaningful progress commits such as completed layout, extracted shared widget, or finished navigation wiring.
 - For structure/setup PRs, keep the PR focused on layout and starter files.
 
 ## Validation
