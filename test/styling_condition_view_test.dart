@@ -31,6 +31,7 @@ void main() {
     await tester.tap(find.text('상의'));
     await tester.pump();
     expect(find.text('상의'), findsOneWidget);
+    expect(find.text('전신'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('가격 낮은순'),
@@ -48,5 +49,27 @@ void main() {
     await tester.tap(find.text('초기화'));
     await tester.pump();
     expect(find.text('AI 추천순'), findsWidgets);
+  });
+
+  testWidgets('supports multi-select for categories', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: StylingConditionView(),
+      ),
+    );
+
+    await tester.tap(find.text('상의'));
+    await tester.pump();
+    await tester.tap(find.text('하의'));
+    await tester.pump();
+
+    expect(find.text('전신'), findsOneWidget);
+    expect(find.text('상의'), findsOneWidget);
+    expect(find.text('하의'), findsOneWidget);
+
+    await tester.tap(find.text('전신'));
+    await tester.pump();
+
+    expect(find.text('전신'), findsOneWidget);
   });
 }

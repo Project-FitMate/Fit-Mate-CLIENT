@@ -101,8 +101,8 @@ class _StylingConditionViewState extends State<StylingConditionView> {
                   return ConditionFilterChip(
                     label: category,
                     icon: icons[category],
-                    isSelected: condition.category == category,
-                    onTap: () => _viewModel.selectCategory(category),
+                    isSelected: condition.categories.contains(category),
+                    onTap: () => _viewModel.toggleCategory(category),
                   );
                 }).toList(),
               ),

@@ -7,7 +7,7 @@ class StylingConditionViewModel extends ChangeNotifier {
   static const priceRangeOptions = ['~3만원', '3~10만원', '10~20만원', '20만원+'];
 
   StylingCondition _condition = const StylingCondition(
-    category: '전신',
+    categories: ['전신'],
     minPrice: 18000,
     maxPrice: 150000,
     priceRangeLabel: '3~10만원',
@@ -16,8 +16,19 @@ class StylingConditionViewModel extends ChangeNotifier {
 
   StylingCondition get condition => _condition;
 
-  void selectCategory(String category) {
-    _condition = _condition.copyWith(category: category);
+  void toggleCategory(String category) {
+    final nextCategories = List<String>.from(_condition.categories);
+
+    if (nextCategories.contains(category)) {
+      if (nextCategories.length == 1) {
+        return;
+      }
+      nextCategories.remove(category);
+    } else {
+      nextCategories.add(category);
+    }
+
+    _condition = _condition.copyWith(categories: nextCategories);
     notifyListeners();
   }
 
@@ -33,7 +44,7 @@ class StylingConditionViewModel extends ChangeNotifier {
 
   void reset() {
     _condition = const StylingCondition(
-      category: '전신',
+      categories: ['전신'],
       minPrice: 18000,
       maxPrice: 150000,
       priceRangeLabel: '3~10만원',
