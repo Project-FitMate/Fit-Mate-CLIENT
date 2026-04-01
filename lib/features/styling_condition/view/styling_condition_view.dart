@@ -113,8 +113,16 @@ class _StylingConditionViewState extends State<StylingConditionView> {
               ),
               const SizedBox(height: 12),
               PriceRangeSection(
-                selectedRange: condition.priceRangeLabel,
-                onRangeTap: _viewModel.selectPriceRange,
+                minPrice: condition.minPrice,
+                maxPrice: condition.maxPrice,
+                minAllowedPrice: StylingConditionViewModel.minAllowedPrice,
+                maxAllowedPrice: StylingConditionViewModel.maxAllowedPrice,
+                onChanged: (values) {
+                  _viewModel.updatePriceRange(
+                    start: values.start,
+                    end: values.end,
+                  );
+                },
               ),
               const SizedBox(height: 24),
               const _SectionTitle(

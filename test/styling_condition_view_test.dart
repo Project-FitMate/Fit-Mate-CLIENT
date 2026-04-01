@@ -42,10 +42,6 @@ void main() {
     await tester.pump();
     expect(find.text('가격 낮은순'), findsOneWidget);
 
-    await tester.tap(find.text('20만원+'));
-    await tester.pump();
-    expect(find.text('20만원+'), findsOneWidget);
-
     await tester.tap(find.text('초기화'));
     await tester.pump();
     expect(find.text('AI 추천순'), findsWidgets);
@@ -71,5 +67,17 @@ void main() {
     await tester.pump();
 
     expect(find.text('전신'), findsOneWidget);
+  });
+
+  testWidgets('renders draggable price range selector', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: StylingConditionView(),
+      ),
+    );
+
+    expect(find.byType(RangeSlider), findsOneWidget);
+    expect(find.text('₩18,000'), findsOneWidget);
+    expect(find.text('₩150,000'), findsOneWidget);
   });
 }

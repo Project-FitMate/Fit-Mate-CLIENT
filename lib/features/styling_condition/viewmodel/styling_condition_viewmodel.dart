@@ -4,13 +4,13 @@ import 'package:fit_mate_client/features/styling_condition/model/styling_conditi
 class StylingConditionViewModel extends ChangeNotifier {
   static const categoryOptions = ['전신', '상의', '하의', '아우터', '원피스', '신발'];
   static const sortOptions = ['AI 추천순', '가격 낮은순', '인기순', '신상품'];
-  static const priceRangeOptions = ['~3만원', '3~10만원', '10~20만원', '20만원+'];
+  static const minAllowedPrice = 0;
+  static const maxAllowedPrice = 200000;
 
   StylingCondition _condition = const StylingCondition(
     categories: ['전신'],
     minPrice: 18000,
     maxPrice: 150000,
-    priceRangeLabel: '3~10만원',
     sortOption: 'AI 추천순',
   );
 
@@ -37,8 +37,14 @@ class StylingConditionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectPriceRange(String rangeLabel) {
-    _condition = _condition.copyWith(priceRangeLabel: rangeLabel);
+  void updatePriceRange({
+    required double start,
+    required double end,
+  }) {
+    _condition = _condition.copyWith(
+      minPrice: start.round(),
+      maxPrice: end.round(),
+    );
     notifyListeners();
   }
 
@@ -47,7 +53,6 @@ class StylingConditionViewModel extends ChangeNotifier {
       categories: ['전신'],
       minPrice: 18000,
       maxPrice: 150000,
-      priceRangeLabel: '3~10만원',
       sortOption: 'AI 추천순',
     );
     notifyListeners();
