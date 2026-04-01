@@ -63,6 +63,9 @@ feature/
 - 화면 구현 요청이 없는 경우, 상세 UI를 과하게 완성하지 않습니다.
 - 네비게이션, API 연동, 상태 공유는 요청 범위 안에서만 구현합니다.
 - 공통 스타일은 `core/theme` 또는 `core/constants`에서 관리합니다.
+- 모바일 화면은 다양한 높이에서 깨지지 않도록 반응형으로 작성합니다.
+- 큰 세로 간격이나 카드 높이를 고정값으로만 처리하지 않습니다.
+- `LayoutBuilder`, `Flexible`, 스크롤 가능한 레이아웃을 우선 검토합니다.
 
 ## 6. State Management Rules
 
@@ -77,6 +80,8 @@ feature/
 - 하나의 PR은 하나의 목적만 담도록 합니다.
   - 예: 구조 세팅, 특정 화면 구현, API 연동
 - Flutter가 익숙하지 않은 팀원도 이해할 수 있도록 구조와 의도를 명확히 유지합니다.
+- 작업이 커지기 전에, 의미 있는 단위로 자주 커밋합니다.
+  - 예: 레이아웃 완성, 공용 위젯 정리, 네비게이션 연결
 
 ## 8. PR Rules
 
@@ -87,7 +92,20 @@ feature/
   - 검증 방법
 - 구조 PR에서는 반드시 “구조만 세팅한 PR”인지 여부를 명시합니다.
 
-## 9. Validation
+## 9. Commit Rules
+
+- 커밋은 너무 커지기 전에, 하나의 논리적 변경 단위로 나눕니다.
+- 화면 구현 중에도 아래 기준을 넘기면 중간 커밋을 남깁니다.
+  - 한 화면의 레이아웃이 안정적으로 잡혔을 때
+  - 공용 위젯을 분리했을 때
+  - 상태 관리 또는 네비게이션 연결이 완료됐을 때
+- “작업 중간 저장”이 아니라, 되돌릴 수 있는 의미 단위 커밋을 목표로 합니다.
+- 추천 예시
+  - `feat: implement upload screen layout`
+  - `refactor: extract shared action button`
+  - `docs: update feature workflow rules`
+
+## 10. Validation
 
 - 코드 변경 후 아래 검증을 기본으로 합니다.
 
@@ -96,7 +114,7 @@ flutter analyze
 flutter test
 ```
 
-## 10. Future Expansion
+## 11. Future Expansion
 
 - 인증 기능은 추후 별도 feature로 확장합니다.
 - API 연결이 본격화되면 feature 내부에 `repository` 또는 `data` 레이어 도입을 검토합니다.
