@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fit_mate_client/features/styling_condition/view/styling_condition_view.dart';
 import 'package:fit_mate_client/features/upload/viewmodel/upload_viewmodel.dart';
 import 'package:fit_mate_client/features/upload/widget/upload_placeholder_section.dart';
 import 'package:fit_mate_client/shared/widgets/primary_action_button.dart';
@@ -12,6 +13,14 @@ class UploadView extends StatefulWidget {
 
 class _UploadViewState extends State<UploadView> {
   late final UploadViewModel _viewModel;
+
+  void _goToStylingCondition() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const StylingConditionView(),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -128,7 +137,7 @@ class _UploadViewState extends State<UploadView> {
                       PrimaryActionButton(
                         label: '사진 분석하기',
                         icon: Icons.auto_awesome_rounded,
-                        onPressed: _viewModel.hasPhoto ? () {} : null,
+                        onPressed: _viewModel.hasPhoto ? _goToStylingCondition : null,
                       ),
                     ],
                   );
