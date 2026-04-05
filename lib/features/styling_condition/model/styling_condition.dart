@@ -1,11 +1,28 @@
 class StylingCondition {
   const StylingCondition({
-    required this.category,
+    required this.categories,
     required this.minPrice,
     required this.maxPrice,
+    required this.sortOption,
   });
 
-  final String category;
+  final List<String> categories;
   final int minPrice;
   final int maxPrice;
+  final String sortOption;
+
+  StylingCondition copyWith({
+    List<String>? categories,
+    int? minPrice,
+    int? maxPrice,
+    String? priceRangeLabel,
+    String? sortOption,
+  }) {
+    return StylingCondition(
+      categories: categories ?? this.categories,
+      minPrice: minPrice ?? this.minPrice,
+      maxPrice: maxPrice ?? this.maxPrice,
+      sortOption: sortOption ?? this.sortOption,
+    );
+  }
 }
