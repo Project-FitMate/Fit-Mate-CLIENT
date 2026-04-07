@@ -7,8 +7,7 @@ enum RecommendationStatus { initial, loading, success, error }
 class RecommendationViewModel extends ChangeNotifier {
   RecommendationViewModel({
     required this.clothingType,
-    RecommendationRepository? repository,
-  }) : _repository = repository ?? RecommendationRepository() {
+  }) : _repository = RecommendationRepository() {
     _load();
   }
 
