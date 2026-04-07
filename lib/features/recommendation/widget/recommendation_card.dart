@@ -193,15 +193,17 @@ class _PriceRow extends StatelessWidget {
               decorationColor: Color(0xFF9CA3AF),
             ),
           ),
-          const SizedBox(width: 4),
-          Text(
-            '-$discountRate%',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: ColorConstants.rose,
+          if (discountRate != null) ...[
+            const SizedBox(width: 4),
+            Text(
+              '-$discountRate%',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: ColorConstants.rose,
+              ),
             ),
-          ),
+          ],
         ],
       ],
     );
