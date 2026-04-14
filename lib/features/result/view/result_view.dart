@@ -3,6 +3,8 @@ import 'package:fit_mate_client/core/constants/color_constants.dart';
 import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/result/model/result_item.dart';
 import 'package:fit_mate_client/features/result/viewmodel/result_viewmodel.dart';
+import 'package:fit_mate_client/features/result/widget/result_category_chips.dart';
+import 'package:fit_mate_client/features/result/widget/result_header.dart';
 import 'package:fit_mate_client/features/result/widget/result_item_card.dart';
 import 'package:fit_mate_client/features/result/widget/result_preview_card.dart';
 
@@ -72,7 +74,9 @@ class _ResultViewState extends State<ResultView> {
           builder: (context, _) {
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: _buildHeader(context)),
+                SliverToBoxAdapter(
+                  child: ResultHeader(onRegenerate: () {}),
+                ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -83,75 +87,20 @@ class _ResultViewState extends State<ResultView> {
                   ),
                 ),
                 SliverToBoxAdapter(child: _buildTabs()),
-                SliverToBoxAdapter(child: _buildCategoryChips()),
-                SliverToBoxAdapter(child: _buildSectionHeader()),
+                SliverToBoxAdapter(
+                  child: ResultCategoryChips(
+                    selectedCategory: _viewModel.selectedCategory,
+                    onSelect: _viewModel.selectCategory,
+                  ),
+                ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
                   sliver: _buildItemGrid(),
                 ),
               ],
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.arrow_back_rounded, size: 20),
-            ),
-          ),
-          const Expanded(
-            child: Text(
-              '착용 결과',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.refresh_rounded, size: 16, color: Color(0xFF64748B)),
-                  SizedBox(width: 4),
-                  Text(
-                    '재생성',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -172,57 +121,6 @@ class _ResultViewState extends State<ResultView> {
             onTap: () => _viewModel.selectTab(ResultTab.recommendations),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryChips() {
-    final categories = [null, ...ClothingType.values];
-    return SizedBox(
-      height: 52,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 4),
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (context, i) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          final isSelected = _viewModel.selectedCategory == category;
-          final label = category?.label ?? '전체';
-          return GestureDetector(
-            onTap: () => _viewModel.selectCategory(category),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? ColorConstants.coral : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: isSelected ? Colors.white : const Color(0xFF64748B),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 4),
-      child: Text(
-        '현재 착용 중 · 아이템 목록',
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: Colors.grey[500],
-        ),
       ),
     );
   }
