@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
+import 'package:fit_mate_client/features/loading/view/loading_view.dart';
 import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/recommendation/viewmodel/recommendation_viewmodel.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_action_button.dart';
@@ -84,7 +85,14 @@ class _RecommendationViewState extends State<RecommendationView> {
         listenable: _viewModel,
         builder: (context, child) => RecommendationActionButton(
           selectedCount: _viewModel.selectedCount,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoadingView(),
+              ),
+            );
+          },
         ),
       ),
     );
