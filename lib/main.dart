@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/theme/app_theme.dart';
-import 'package:fit_mate_client/features/loading/view/loading_view.dart';
+import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
+import 'package:fit_mate_client/features/recommendation/view/recommendation_view.dart';
 
 void main() {
   runApp(const FitMateApp());
@@ -15,7 +16,7 @@ class FitMateApp extends StatelessWidget {
       title: 'Fit Mate',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const LoadingView(),
+      home: const RecommendationView(clothingType: ClothingType.top),
     );
   }
 }

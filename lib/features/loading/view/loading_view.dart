@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fit_mate_client/features/loading/viewmodel/loading_viewmodel.dart';
 import 'package:fit_mate_client/features/loading/widget/loading_scan_frame.dart';
 import 'package:fit_mate_client/features/loading/widget/loading_progress_bar.dart';
+import 'package:fit_mate_client/features/result/view/result_view.dart';
 
 class LoadingView extends StatefulWidget {
   const LoadingView({super.key});
@@ -50,7 +51,7 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
 
     _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 8),
     )..forward();
     _progressAnim = Tween<double>(begin: 0.0, end: 0.95).animate(
       CurvedAnimation(
@@ -58,6 +59,14 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
         curve: const Cubic(0.1, 0.5, 0.5, 1.0),
       ),
     );
+    _progressController.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ResultView()),
+        );
+      }
+    });
 
     _fillController = AnimationController(
       vsync: this,
