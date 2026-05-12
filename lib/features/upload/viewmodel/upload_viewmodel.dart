@@ -51,15 +51,18 @@ class UploadViewModel extends ChangeNotifier {
 
     try {
       final file = File(picked.path);
+      debugPrint('[UploadViewModel] uploading path=${file.path} size=${await file.length()}');
       final response = await _apiClient.postMultipartFile(
         '/user/image',
         field: 'image',
         file: file,
       );
+      debugPrint('[UploadViewModel] upload response=$response');
       final filename = (response as Map<String, dynamic>)['filename'] as String;
       _photo = UploadPhoto(file: file, userImageName: filename);
       _status = UploadStatus.ready;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[UploadViewModel] upload failed: $e\n$st');
       _photo = null;
       _errorMessage = '사진 업로드에 실패했습니다.';
       _status = UploadStatus.error;

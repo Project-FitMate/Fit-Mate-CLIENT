@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:flutter/foundation.dart';
 import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/recommendation/repository/recommendation_repository.dart';
@@ -64,8 +65,10 @@ class RecommendationViewModel extends ChangeNotifier {
         maxPrice: maxPrice,
         userImageName: userImageName,
       );
+      debugPrint('[RecommendationVM] loaded ${_products.length} products, searchQuery="$_searchQuery"');
       _status = RecommendationStatus.success;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[RecommendationVM] load failed: $e\n$st');
       _errorMessage = '추천 아이템을 불러오지 못했습니다.';
       _status = RecommendationStatus.error;
     }
