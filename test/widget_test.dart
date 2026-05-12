@@ -1,28 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fit_mate_client/main.dart';
+import 'package:fit_mate_client/features/recommendation/widget/recommendation_card.dart';
 
 void main() {
-  testWidgets('renders upload screen', (WidgetTester tester) async {
+  testWidgets('renders recommendation screen', (WidgetTester tester) async {
     await tester.pumpWidget(const FitMateApp());
+    await tester.pump(const Duration(milliseconds: 700));
 
-    expect(find.text('핏메이트'), findsOneWidget);
-    expect(find.text('카메라 촬영'), findsOneWidget);
-    expect(find.text('내 사진 업로드'), findsOneWidget);
-    expect(find.text('사진 분석하기'), findsOneWidget);
+    expect(find.text('나에게 맞는 추천 스타일'), findsOneWidget);
+    expect(find.text('전체'), findsOneWidget);
+    expect(find.text('상의'), findsWidgets);
+    expect(find.text('하의'), findsWidgets);
+    expect(find.text('신발'), findsWidgets);
+    expect(find.text('옷을 선택해주세요'), findsOneWidget);
   });
 
-  testWidgets('navigates to styling condition screen', (WidgetTester tester) async {
+  testWidgets('selects product on recommendation screen', (WidgetTester tester) async {
     await tester.pumpWidget(const FitMateApp());
+    await tester.pump(const Duration(milliseconds: 700));
 
-    await tester.tap(find.text('카메라 촬영'));
+    await tester.tap(find.byType(RecommendationCard).first);
     await tester.pump();
 
-    await tester.ensureVisible(find.text('사진 분석하기'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('사진 분석하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('착용 조건 설정'), findsOneWidget);
-    expect(find.text('제품 검색'), findsOneWidget);
+    expect(find.text('선택한 옷 착용 이미지 생성하기'), findsOneWidget);
   });
 }

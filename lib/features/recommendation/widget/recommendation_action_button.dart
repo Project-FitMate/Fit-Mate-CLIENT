@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 class RecommendationActionButton extends StatelessWidget {
   const RecommendationActionButton({
     super.key,
-    required this.selectedCount,
+    required this.hasSelection,
     required this.onPressed,
   });
 
-  final int selectedCount;
+  final bool hasSelection;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final isActive = selectedCount > 0;
+    final isActive = hasSelection;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       color: Colors.white,

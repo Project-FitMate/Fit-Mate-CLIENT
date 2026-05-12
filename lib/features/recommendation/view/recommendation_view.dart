@@ -3,22 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
 import 'package:fit_mate_client/features/loading/view/loading_view.dart';
-import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/recommendation/viewmodel/recommendation_viewmodel.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_action_button.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_card.dart';
+import 'package:fit_mate_client/features/recommendation/widget/recommendation_category_tabs.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_header.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_search_bar.dart';
-import 'package:fit_mate_client/features/recommendation/widget/recommendation_selection_banner.dart';
 
 class RecommendationView extends StatefulWidget {
   const RecommendationView({
     super.key,
-    required this.clothingType,
+    required this.categories,
     this.uploadedImage,
   });
 
-  final ClothingType clothingType;
+  final List<String> categories;
   final File? uploadedImage;
 
   @override
@@ -32,7 +31,7 @@ class _RecommendationViewState extends State<RecommendationView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = RecommendationViewModel(clothingType: widget.clothingType);
+    _viewModel = RecommendationViewModel(categories: widget.categories);
     _searchController = TextEditingController();
   }
 
@@ -54,10 +53,17 @@ class _RecommendationViewState extends State<RecommendationView> {
             return Column(
               children: [
                 RecommendationHeader(
-                  clothingType: widget.clothingType,
+                  categories: widget.categories,
                   uploadedImage: widget.uploadedImage,
                   productCount: _viewModel.products.length,
                 ),
+                const SizedBox(height: 8),
+                RecommendationCategoryTabs(
+                  categories: widget.categories,
+                  selectedCategory: _viewModel.selectedCategory,
+                  onSelect: _viewModel.selectCategory,
+                ),
+                const SizedBox(height: 8),
                 RecommendationSearchBar(
                   controller: _searchController,
                   onChanged: _viewModel.updateSearchQuery,
@@ -84,7 +90,7 @@ class _RecommendationViewState extends State<RecommendationView> {
       bottomNavigationBar: ListenableBuilder(
         listenable: _viewModel,
         builder: (context, child) => RecommendationActionButton(
-          selectedCount: _viewModel.selectedCount,
+          hasSelection: _viewModel.hasSelection,
           onPressed: () {
             Navigator.push(
               context,
@@ -126,22 +132,16 @@ class _ProductList extends StatelessWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-      itemCount: products.length + 1,
+      itemCount: products.length,
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return RecommendationSelectionBanner(
-            selectedCount: viewModel.selectedCount,
-            onClear: viewModel.clearSelection,
-          );
-        }
-        final product = products[index - 1];
+        final product = products[index];
         final isSelected = viewModel.isSelected(product.id);
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: RecommendationCard(
             product: product,
             isSelected: isSelected,
-            isDisabled: !viewModel.canSelect && !isSelected,
+            isDisabled: false,
             onTap: () => viewModel.toggleSelection(product.id),
           ),
         );
