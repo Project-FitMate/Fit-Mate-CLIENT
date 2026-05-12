@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/theme/app_theme.dart';
-import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/recommendation/view/recommendation_view.dart';
 
 void main() {
@@ -16,7 +15,7 @@ class FitMateApp extends StatelessWidget {
       title: 'Fit Mate',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const RecommendationView(clothingType: ClothingType.top),
+      home: const RecommendationView(categories: ['상의', '하의', '신발']),
     );
   }
 }

@@ -6,45 +6,54 @@ enum RecommendationStatus { initial, loading, success, error }
 
 class RecommendationViewModel extends ChangeNotifier {
   RecommendationViewModel({
-    required this.clothingType,
+    required this.categories,
   }) : _repository = RecommendationRepository() {
     _load();
   }
 
-  final ClothingType clothingType;
+  final List<String> categories;
   final RecommendationRepository _repository;
 
   RecommendationStatus _status = RecommendationStatus.initial;
-  List<RecommendedProduct> _products = [];
+  List<RecommendedProduct> _allProducts = [];
   String? _errorMessage;
   String _searchQuery = '';
+  String? _selectedCategory;
 
-  final Set<String> _selectedIds = {};
+  // clothingType별로 선택된 productId 저장 (카테고리당 1개)
+  final Map<ClothingType, String> _selectedByType = {};
 
   RecommendationStatus get status => _status;
   String? get errorMessage => _errorMessage;
-  int get selectedCount => _selectedIds.length;
-  bool get hasSelection => _selectedIds.isNotEmpty;
+  String? get selectedCategory => _selectedCategory;
+  bool get hasSelection => _selectedByType.isNotEmpty;
 
-  bool get canSelect => _selectedIds.length < 3;
-
-  bool isSelected(String productId) => _selectedIds.contains(productId);
+  bool isSelected(String productId) => _selectedByType.containsValue(productId);
 
   List<RecommendedProduct> get products {
-    if (_searchQuery.isEmpty) return _products;
+    var filtered = _selectedCategory == null
+        ? _allProducts
+        : _allProducts.where((p) => p.clothingType.label == _selectedCategory).toList();
+
+    if (_searchQuery.isEmpty) return filtered;
     final q = _searchQuery.toLowerCase();
-    return _products.where((p) {
+    return filtered.where((p) {
       return p.name.toLowerCase().contains(q) ||
           p.brand.toLowerCase().contains(q) ||
           p.tags.any((t) => t.toLowerCase().contains(q));
     }).toList();
   }
 
+  void selectCategory(String? category) {
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     _status = RecommendationStatus.loading;
     notifyListeners();
     try {
-      _products = await _repository.fetchByType(clothingType);
+      _allProducts = await _repository.fetchByCategories(categories);
       _status = RecommendationStatus.success;
     } catch (e) {
       _errorMessage = '추천 아이템을 불러오지 못했습니다.';
@@ -61,16 +70,21 @@ class RecommendationViewModel extends ChangeNotifier {
   }
 
   void toggleSelection(String productId) {
-    if (_selectedIds.contains(productId)) {
-      _selectedIds.remove(productId);
-    } else if (canSelect) {
-      _selectedIds.add(productId);
+    final product = _allProducts.firstWhere((p) => p.id == productId);
+    final type = product.clothingType;
+
+    if (_selectedByType[type] == productId) {
+      // 같은 상품 다시 누르면 해제
+      _selectedByType.remove(type);
+    } else {
+      // 같은 카테고리의 기존 선택을 덮어씀
+      _selectedByType[type] = productId;
     }
     notifyListeners();
   }
 
   void clearSelection() {
-    _selectedIds.clear();
+    _selectedByType.clear();
     notifyListeners();
   }
 }

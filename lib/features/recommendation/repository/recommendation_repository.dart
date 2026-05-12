@@ -5,6 +5,12 @@ class RecommendationRepository {
     await Future.delayed(const Duration(milliseconds: 600));
     return _mockData.where((p) => p.clothingType == type).toList();
   }
+
+  Future<List<RecommendedProduct>> fetchByCategories(List<String> categories) async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    final types = categories.map(ClothingType.fromLabel).toSet();
+    return _mockData.where((p) => types.contains(p.clothingType)).toList();
+  }
 }
 
 const List<RecommendedProduct> _mockData = [
