@@ -9,12 +9,12 @@ class ResultCategoryChips extends StatelessWidget {
     required this.onSelect,
   });
 
-  final ClothingType? selectedCategory;
-  final ValueChanged<ClothingType?> onSelect;
+  final OutfitPart? selectedCategory;
+  final ValueChanged<OutfitPart?> onSelect;
 
   @override
   Widget build(BuildContext context) {
-    final categories = [null, ...ClothingType.values];
+    final categories = <OutfitPart?>[null, ...OutfitPart.values];
     return SizedBox(
       height: 52,
       child: ListView.separated(

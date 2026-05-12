@@ -12,8 +12,8 @@ class UploadPlaceholderSection extends StatelessWidget {
 
   final bool cameraSelected;
   final bool gallerySelected;
-  final VoidCallback onCameraTap;
-  final VoidCallback onGalleryTap;
+  final VoidCallback? onCameraTap;
+  final VoidCallback? onGalleryTap;
   final double height;
 
   @override
@@ -56,7 +56,7 @@ class _UploadOptionCard extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

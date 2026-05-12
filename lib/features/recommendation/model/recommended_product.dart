@@ -1,18 +1,21 @@
-enum ClothingType {
-  top('상의'),
-  bottom('하의'),
-  outer('아우터'),
-  shoes('신발'),
-  accessory('액세서리');
+enum OutfitPart {
+  full('FULL', '전신'),
+  top('TOP', '상의'),
+  bottom('BOTTOM', '하의'),
+  outer('OUTER', '아우터'),
+  dress('DRESS', '원피스'),
+  shoes('SHOES', '신발'),
+  hat('HAT', '모자');
 
-  const ClothingType(this.label);
+  const OutfitPart(this.wire, this.label);
 
+  final String wire;
   final String label;
 
-  static ClothingType fromLabel(String label) {
-    return ClothingType.values.firstWhere(
+  static OutfitPart fromLabel(String label) {
+    return OutfitPart.values.firstWhere(
       (e) => e.label == label,
-      orElse: () => ClothingType.top,
+      orElse: () => OutfitPart.top,
     );
   }
 }
@@ -24,10 +27,10 @@ class RecommendedProduct {
     required this.brand,
     required this.price,
     required this.imageUrl,
-    required this.clothingType,
+    required this.productUrl,
+    this.outfitPart,
     this.originalPrice,
     this.discountRate,
-    this.productUrl = '',
     this.tags = const [],
   });
 
@@ -38,7 +41,20 @@ class RecommendedProduct {
   final int? originalPrice;
   final int? discountRate;
   final String imageUrl;
-  final ClothingType clothingType;
+  final OutfitPart? outfitPart;
   final String productUrl;
   final List<String> tags;
+
+  factory RecommendedProduct.fromJson(Map<String, dynamic> json, {OutfitPart? part}) {
+    final link = (json['link'] ?? '') as String;
+    return RecommendedProduct(
+      id: link.isEmpty ? json['name'].toString() : link,
+      name: (json['name'] ?? '') as String,
+      brand: (json['brand'] ?? '') as String,
+      price: (json['price'] as num?)?.toInt() ?? 0,
+      imageUrl: (json['image'] ?? '') as String,
+      productUrl: link,
+      outfitPart: part,
+    );
+  }
 }

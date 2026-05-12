@@ -15,9 +15,11 @@ class _UploadViewState extends State<UploadView> {
   late final UploadViewModel _viewModel;
 
   void _goToStylingCondition() {
+    final photo = _viewModel.photo;
+    if (photo == null) return;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const StylingConditionView(),
+        builder: (_) => StylingConditionView(photo: photo),
       ),
     );
   }
@@ -56,6 +58,7 @@ class _UploadViewState extends State<UploadView> {
               return AnimatedBuilder(
                 animation: _viewModel,
                 builder: (context, _) {
+                  final isUploading = _viewModel.status == UploadStatus.uploading;
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
                     children: [
@@ -125,17 +128,28 @@ class _UploadViewState extends State<UploadView> {
                             _viewModel.selectedSource == UploadSource.camera,
                         gallerySelected:
                             _viewModel.selectedSource == UploadSource.gallery,
-                        onCameraTap: () {
-                          _viewModel.selectSource(UploadSource.camera);
-                        },
-                        onGalleryTap: () {
-                          _viewModel.selectSource(UploadSource.gallery);
-                        },
+                        onCameraTap: isUploading
+                            ? null
+                            : () => _viewModel.selectSource(UploadSource.camera),
+                        onGalleryTap: isUploading
+                            ? null
+                            : () => _viewModel.selectSource(UploadSource.gallery),
                         height: uploadHeight,
                       ),
+                      if (_viewModel.errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            _viewModel.errorMessage!,
+                            style: const TextStyle(
+                              color: Color(0xFFFFB4B4),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
                       SizedBox(height: bottomSpacing),
                       PrimaryActionButton(
-                        label: '사진 분석하기',
+                        label: isUploading ? '업로드 중...' : '사진 분석하기',
                         icon: Icons.auto_awesome_rounded,
                         onPressed: _viewModel.hasPhoto ? _goToStylingCondition : null,
                       ),

@@ -49,9 +49,7 @@ class RecommendationSelectionBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              hasSelection
-                  ? '$selectedCount개 선택됨 · 최대 3개 선택 가능'
-                  : '옷을 선택해주세요 · 최대 3개',
+              hasSelection ? '1개 선택됨' : '옷을 선택해주세요',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fit_mate_client/features/recommendation/view/recommendation_view.dart';
 import 'package:fit_mate_client/features/styling_condition/viewmodel/styling_condition_viewmodel.dart';
 import 'package:fit_mate_client/features/styling_condition/widget/condition_filter_chip.dart';
 import 'package:fit_mate_client/features/styling_condition/widget/price_range_section.dart';
 import 'package:fit_mate_client/features/styling_condition/widget/upload_status_card.dart';
+import 'package:fit_mate_client/features/upload/model/upload_photo.dart';
 import 'package:fit_mate_client/shared/widgets/primary_action_button.dart';
 
 class StylingConditionView extends StatefulWidget {
-  const StylingConditionView({super.key});
+  const StylingConditionView({super.key, required this.photo});
+
+  final UploadPhoto photo;
 
   @override
   State<StylingConditionView> createState() => _StylingConditionViewState();
@@ -25,6 +29,21 @@ class _StylingConditionViewState extends State<StylingConditionView> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _goToRecommendation() {
+    final c = _viewModel.condition;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => RecommendationView(
+          part: c.category,
+          minPrice: c.minPrice,
+          maxPrice: c.maxPrice,
+          userImageName: widget.photo.userImageName,
+          uploadedImage: widget.photo.file,
+        ),
+      ),
+    );
   }
 
   @override
@@ -56,7 +75,7 @@ class _StylingConditionViewState extends State<StylingConditionView> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             children: [
-              const UploadStatusCard(),
+              UploadStatusCard(photoFile: widget.photo.file),
               const SizedBox(height: 20),
               const _SectionTitle(
                 icon: Icons.search_rounded,
@@ -96,13 +115,14 @@ class _StylingConditionViewState extends State<StylingConditionView> {
                     '아우터': '🧥',
                     '원피스': '👗',
                     '신발': '👟',
+                    '모자': '🧢',
                   };
 
                   return ConditionFilterChip(
                     label: category,
                     icon: icons[category],
-                    isSelected: condition.categories.contains(category),
-                    onTap: () => _viewModel.toggleCategory(category),
+                    isSelected: condition.category.label == category,
+                    onTap: () => _viewModel.selectCategory(category),
                   );
                 }).toList(),
               ),
@@ -125,6 +145,8 @@ class _StylingConditionViewState extends State<StylingConditionView> {
                 },
               ),
               const SizedBox(height: 24),
+              // Sort selection is a client-side display preference only;
+              // it is intentionally not sent to the server.
               const _SectionTitle(
                 icon: Icons.bar_chart_rounded,
                 label: '정렬 기준',
@@ -147,7 +169,7 @@ class _StylingConditionViewState extends State<StylingConditionView> {
               PrimaryActionButton(
                 label: '스타일 추천받기',
                 icon: Icons.auto_awesome_rounded,
-                onPressed: () {},
+                onPressed: _goToRecommendation,
               ),
             ],
           );

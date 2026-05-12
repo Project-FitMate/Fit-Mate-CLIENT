@@ -14,11 +14,17 @@ import 'package:fit_mate_client/features/recommendation/widget/recommendation_se
 class RecommendationView extends StatefulWidget {
   const RecommendationView({
     super.key,
-    required this.clothingType,
+    required this.part,
+    required this.minPrice,
+    required this.maxPrice,
+    required this.userImageName,
     this.uploadedImage,
   });
 
-  final ClothingType clothingType;
+  final OutfitPart part;
+  final int minPrice;
+  final int maxPrice;
+  final String userImageName;
   final File? uploadedImage;
 
   @override
@@ -32,7 +38,12 @@ class _RecommendationViewState extends State<RecommendationView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = RecommendationViewModel(clothingType: widget.clothingType);
+    _viewModel = RecommendationViewModel(
+      part: widget.part,
+      minPrice: widget.minPrice,
+      maxPrice: widget.maxPrice,
+      userImageName: widget.userImageName,
+    );
     _searchController = TextEditingController();
   }
 
@@ -41,6 +52,20 @@ class _RecommendationViewState extends State<RecommendationView> {
     _viewModel.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onProceed() {
+    final selected = _viewModel.selectedProduct;
+    if (selected == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LoadingView(
+          userImageName: widget.userImageName,
+          outfitImageUrl: selected.imageUrl,
+        ),
+      ),
+    );
   }
 
   @override
@@ -54,7 +79,7 @@ class _RecommendationViewState extends State<RecommendationView> {
             return Column(
               children: [
                 RecommendationHeader(
-                  clothingType: widget.clothingType,
+                  part: widget.part,
                   uploadedImage: widget.uploadedImage,
                   productCount: _viewModel.products.length,
                 ),
@@ -85,14 +110,7 @@ class _RecommendationViewState extends State<RecommendationView> {
         listenable: _viewModel,
         builder: (context, child) => RecommendationActionButton(
           selectedCount: _viewModel.selectedCount,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoadingView(),
-              ),
-            );
-          },
+          onPressed: _onProceed,
         ),
       ),
     );
@@ -141,7 +159,6 @@ class _ProductList extends StatelessWidget {
           child: RecommendationCard(
             product: product,
             isSelected: isSelected,
-            isDisabled: !viewModel.canSelect && !isSelected,
             onTap: () => viewModel.toggleSelection(product.id),
           ),
         );

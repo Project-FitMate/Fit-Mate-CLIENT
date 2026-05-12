@@ -1,30 +1,69 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'package:fit_mate_client/core/network/api_client.dart';
 import 'package:fit_mate_client/features/upload/model/upload_photo.dart';
 
-enum UploadSource {
-  camera,
-  gallery,
-}
+enum UploadSource { camera, gallery }
+
+enum UploadStatus { idle, picking, uploading, ready, error }
 
 class UploadViewModel extends ChangeNotifier {
+  UploadViewModel({ApiClient? apiClient, ImagePicker? picker})
+      : _apiClient = apiClient ?? ApiClient(),
+        _picker = picker ?? ImagePicker();
+
+  final ApiClient _apiClient;
+  final ImagePicker _picker;
+
   UploadPhoto? _photo;
   UploadSource? _selectedSource;
+  UploadStatus _status = UploadStatus.idle;
+  String? _errorMessage;
 
   UploadPhoto? get photo => _photo;
   UploadSource? get selectedSource => _selectedSource;
+  UploadStatus get status => _status;
+  String? get errorMessage => _errorMessage;
+  bool get hasPhoto => _photo != null && _status == UploadStatus.ready;
 
-  bool get hasPhoto => _photo != null;
-
-  void selectSource(UploadSource source) {
+  Future<void> selectSource(UploadSource source) async {
     _selectedSource = source;
-    _photo = UploadPhoto(
-      fileName: source == UploadSource.camera
-          ? 'camera_photo.png'
-          : 'gallery_photo.png',
-      localPath: source == UploadSource.camera
-          ? '/mock/camera_photo.png'
-          : '/mock/gallery_photo.png',
+    _status = UploadStatus.picking;
+    _errorMessage = null;
+    notifyListeners();
+
+    final picked = await _picker.pickImage(
+      source: source == UploadSource.camera
+          ? ImageSource.camera
+          : ImageSource.gallery,
     );
+    if (picked == null) {
+      _status = _photo == null ? UploadStatus.idle : UploadStatus.ready;
+      notifyListeners();
+      return;
+    }
+
+    _status = UploadStatus.uploading;
+    notifyListeners();
+
+    try {
+      final file = File(picked.path);
+      final response = await _apiClient.postMultipartFile(
+        '/user/image',
+        field: 'image',
+        file: file,
+      );
+      final filename = (response as Map<String, dynamic>)['filename'] as String;
+      _photo = UploadPhoto(file: file, userImageName: filename);
+      _status = UploadStatus.ready;
+    } catch (e) {
+      _photo = null;
+      _errorMessage = '사진 업로드에 실패했습니다.';
+      _status = UploadStatus.error;
+    }
     notifyListeners();
   }
 }

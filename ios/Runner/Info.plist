@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>전신 사진을 촬영하여 가상 피팅에 사용합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>전신 사진을 선택하여 가상 피팅에 사용합니다.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

@@ -5,7 +5,14 @@ import 'package:fit_mate_client/features/loading/widget/loading_progress_bar.dar
 import 'package:fit_mate_client/features/result/view/result_view.dart';
 
 class LoadingView extends StatefulWidget {
-  const LoadingView({super.key});
+  const LoadingView({
+    super.key,
+    required this.userImageName,
+    required this.outfitImageUrl,
+  });
+
+  final String userImageName;
+  final String outfitImageUrl;
 
   @override
   State<LoadingView> createState() => _LoadingViewState();
@@ -28,11 +35,16 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
   late final AnimationController _fillController;
   late final Animation<double> _fillAnim;
 
+  bool _navigated = false;
+
   @override
   void initState() {
     super.initState();
 
-    _viewModel = LoadingViewModel();
+    _viewModel = LoadingViewModel(
+      userImageName: widget.userImageName,
+      outfitImageUrl: widget.outfitImageUrl,
+    );
 
     _loopController = AnimationController(
       vsync: this,
@@ -59,14 +71,6 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
         curve: const Cubic(0.1, 0.5, 0.5, 1.0),
       ),
     );
-    _progressController.addStatusListener((status) {
-      if (status == AnimationStatus.completed && mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ResultView()),
-        );
-      }
-    });
 
     _fillController = AnimationController(
       vsync: this,
@@ -76,11 +80,32 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
       CurvedAnimation(parent: _fillController, curve: Curves.easeInOut),
     );
 
+    _viewModel.addListener(_onViewModelChange);
     _viewModel.start();
+  }
+
+  void _onViewModelChange() {
+    if (_navigated) return;
+    if (_viewModel.status == FittingStatus.success && _viewModel.result != null) {
+      _navigated = true;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultView(generatedImageBase64: _viewModel.result!.imageBase64),
+        ),
+      );
+    } else if (_viewModel.status == FittingStatus.error) {
+      _navigated = true;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_viewModel.errorMessage ?? '오류가 발생했습니다.')),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_onViewModelChange);
     _viewModel.dispose();
     _loopController.dispose();
     _progressController.dispose();

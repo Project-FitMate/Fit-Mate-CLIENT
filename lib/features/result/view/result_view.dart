@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
-import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/result/model/result_item.dart';
 import 'package:fit_mate_client/features/result/viewmodel/result_viewmodel.dart';
 import 'package:fit_mate_client/features/result/widget/result_category_chips.dart';
@@ -8,41 +10,14 @@ import 'package:fit_mate_client/features/result/widget/result_header.dart';
 import 'package:fit_mate_client/features/result/widget/result_item_card.dart';
 import 'package:fit_mate_client/features/result/widget/result_preview_card.dart';
 
-const _mockItems = [
-  ResultItem(
-    id: '1',
-    name: '플로럴 미디 랩 드레스',
-    brand: 'H&M',
-    price: 49900,
-    imageUrl: '',
-    clothingType: ClothingType.top,
-  ),
-  ResultItem(
-    id: '2',
-    name: '화이트 캔버스 스니커즈',
-    brand: '나이키',
-    price: 79000,
-    imageUrl: '',
-    clothingType: ClothingType.shoes,
-  ),
-  ResultItem(
-    id: '3',
-    name: '미니 크로스백',
-    brand: '무신사',
-    price: 39900,
-    imageUrl: '',
-    clothingType: ClothingType.accessory,
-  ),
-];
-
 class ResultView extends StatefulWidget {
   const ResultView({
     super.key,
-    this.generatedImageUrl = '',
-    this.items = _mockItems,
+    this.generatedImageBase64 = '',
+    this.items = const <ResultItem>[],
   });
 
-  final String generatedImageUrl;
+  final String generatedImageBase64;
   final List<ResultItem> items;
 
   @override
@@ -51,11 +26,19 @@ class ResultView extends StatefulWidget {
 
 class _ResultViewState extends State<ResultView> {
   late final ResultViewModel _viewModel;
+  Uint8List? _decodedImage;
 
   @override
   void initState() {
     super.initState();
     _viewModel = ResultViewModel(items: widget.items);
+    if (widget.generatedImageBase64.isNotEmpty) {
+      try {
+        _decodedImage = base64Decode(widget.generatedImageBase64);
+      } catch (_) {
+        _decodedImage = null;
+      }
+    }
   }
 
   @override
@@ -81,7 +64,7 @@ class _ResultViewState extends State<ResultView> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: ResultPreviewCard(
-                      generatedImageUrl: widget.generatedImageUrl,
+                      generatedImage: _decodedImage,
                       onRegenerate: () {},
                     ),
                   ),

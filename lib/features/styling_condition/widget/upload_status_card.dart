@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class UploadStatusCard extends StatelessWidget {
-  const UploadStatusCard({super.key});
+  const UploadStatusCard({super.key, this.photoFile});
+
+  final File? photoFile;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +26,12 @@ class UploadStatusCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFFFF7A90), width: 1.5),
             ),
-            child: const Center(
-              child: Text('🧍', style: TextStyle(fontSize: 28)),
-            ),
+            clipBehavior: Clip.antiAlias,
+            child: photoFile != null
+                ? Image.file(photoFile!, fit: BoxFit.cover)
+                : const Center(
+                    child: Text('🧍', style: TextStyle(fontSize: 28)),
+                  ),
           ),
           const SizedBox(width: 14),
           const Expanded(

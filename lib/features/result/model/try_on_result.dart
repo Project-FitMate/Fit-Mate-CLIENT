@@ -1,9 +1,5 @@
 class TryOnResult {
-  const TryOnResult({
-    required this.score,
-    required this.imageUrl,
-  });
+  const TryOnResult({required this.imageBase64});
 
-  final int score;
-  final String imageUrl;
+  final String imageBase64;
 }
