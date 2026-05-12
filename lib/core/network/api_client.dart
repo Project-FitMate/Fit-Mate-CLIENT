@@ -22,10 +22,17 @@ class ApiClient {
 
   Uri _uri(String path) => Uri.parse('$baseUrl${AppConfig.apiPrefix}$path');
 
-  Future<dynamic> postJson(String path, Map<String, dynamic> body) async {
+  Future<dynamic> postJson(
+    String path,
+    Map<String, dynamic> body, {
+    Map<String, String>? headers,
+  }) async {
     final response = await http.post(
       _uri(path),
-      headers: const {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        if (headers != null) ...headers,
+      },
       body: jsonEncode(body),
     );
     return _decode(response);

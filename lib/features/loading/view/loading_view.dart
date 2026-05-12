@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fit_mate_client/features/loading/viewmodel/loading_viewmodel.dart';
 import 'package:fit_mate_client/features/loading/widget/loading_scan_frame.dart';
 import 'package:fit_mate_client/features/loading/widget/loading_progress_bar.dart';
+import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
+import 'package:fit_mate_client/features/result/model/result_item.dart';
 import 'package:fit_mate_client/features/result/view/result_view.dart';
 
 class LoadingView extends StatefulWidget {
@@ -9,10 +11,12 @@ class LoadingView extends StatefulWidget {
     super.key,
     required this.userImageName,
     required this.outfitImageUrl,
+    required this.selectedProduct,
   });
 
   final String userImageName;
   final String outfitImageUrl;
+  final RecommendedProduct selectedProduct;
 
   @override
   State<LoadingView> createState() => _LoadingViewState();
@@ -91,7 +95,10 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ResultView(generatedImageBase64: _viewModel.result!.imageBase64),
+          builder: (_) => ResultView(
+            generatedImageBase64: _viewModel.result!.imageBase64,
+            items: [ResultItem.fromProduct(widget.selectedProduct)],
+          ),
         ),
       );
     } else if (_viewModel.status == FittingStatus.error) {

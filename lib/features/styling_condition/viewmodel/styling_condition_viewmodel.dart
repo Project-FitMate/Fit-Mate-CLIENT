@@ -8,7 +8,7 @@ class StylingConditionViewModel extends ChangeNotifier {
   // Client-side only sort options; not sent to the server.
   static const sortOptions = ['AI 추천순', '가격 낮은순', '인기순', '신상품'];
   static const minAllowedPrice = 0;
-  static const maxAllowedPrice = 200000;
+  static const maxAllowedPrice = 500000;
 
   StylingCondition _condition = StylingCondition(
     category: OutfitPart.full,

@@ -7,5 +7,5 @@ void main() {
   testWidgets('renders upload screen', (WidgetTester tester) async {
     await tester.pumpWidget(const FitMateApp());
     expect(find.text('핏메이트'), findsOneWidget);
-  }, skip: 'pending integration rework');
+  }, skip: true);
 }

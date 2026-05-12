@@ -63,6 +63,7 @@ class _RecommendationViewState extends State<RecommendationView> {
         builder: (_) => LoadingView(
           userImageName: widget.userImageName,
           outfitImageUrl: selected.imageUrl,
+          selectedProduct: selected,
         ),
       ),
     );

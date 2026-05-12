@@ -1,3 +1,4 @@
+import 'package:fit_mate_client/core/device/device_id.dart';
 import 'package:fit_mate_client/core/network/api_client.dart';
 import 'package:fit_mate_client/features/result/model/try_on_result.dart';
 
@@ -10,10 +11,15 @@ class FittingRepository {
     required String userImageName,
     required String outfitImageUrl,
   }) async {
-    final data = await _apiClient.postJson('/fitting', {
-      'userImageName': userImageName,
-      'outfitImageUrl': outfitImageUrl,
-    });
+    final deviceId = await DeviceId.get();
+    final data = await _apiClient.postJson(
+      '/fitting',
+      {
+        'userImageName': userImageName,
+        'outfitImageUrl': outfitImageUrl,
+      },
+      headers: {'device-id': deviceId},
+    );
     final image = (data as Map<String, dynamic>)['image'] as String;
     return TryOnResult(imageBase64: image);
   }

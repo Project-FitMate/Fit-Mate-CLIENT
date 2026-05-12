@@ -18,5 +18,5 @@ void main() {
       ),
     );
     expect(find.text('나에게 맞는 추천 스타일'), findsOneWidget);
-  }, skip: 'pending integration rework');
+  }, skip: true);
 }

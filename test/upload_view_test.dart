@@ -8,5 +8,5 @@ void main() {
   testWidgets('renders upload screen layout', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: UploadView()));
     expect(find.text('핏메이트'), findsOneWidget);
-  }, skip: 'pending integration rework');
+  }, skip: true);
 }

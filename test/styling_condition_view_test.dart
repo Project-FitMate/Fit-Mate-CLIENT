@@ -13,5 +13,5 @@ void main() {
     final photo = UploadPhoto(file: File('/tmp/x'), userImageName: 'x');
     await tester.pumpWidget(MaterialApp(home: StylingConditionView(photo: photo)));
     expect(find.text('착용 조건 설정'), findsOneWidget);
-  }, skip: 'pending integration rework');
+  }, skip: true);
 }
