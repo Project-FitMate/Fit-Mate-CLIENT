@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'package:fit_mate_client/core/config/app_config.dart';
 
@@ -44,10 +45,31 @@ class ApiClient {
     required File file,
   }) async {
     final request = http.MultipartRequest('POST', _uri(path));
-    request.files.add(await http.MultipartFile.fromPath(field, file.path));
+    // Without an explicit contentType, http defaults to application/octet-stream,
+    // which the server's mimetype whitelist (jpeg/png/webp) rejects.
+    request.files.add(await http.MultipartFile.fromPath(
+      field,
+      file.path,
+      contentType: _imageMediaType(file.path),
+    ));
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
     return _decode(response);
+  }
+
+  MediaType _imageMediaType(String path) {
+    final ext = path.toLowerCase().split('.').last;
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return MediaType('image', 'jpeg');
+      case 'png':
+        return MediaType('image', 'png');
+      case 'webp':
+        return MediaType('image', 'webp');
+      default:
+        return MediaType('application', 'octet-stream');
+    }
   }
 
   dynamic _decode(http.Response response) {

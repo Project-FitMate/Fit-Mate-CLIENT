@@ -130,7 +130,7 @@ class _ResultViewState extends State<ResultView> {
         crossAxisCount: 2,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        childAspectRatio: 0.72,
+        childAspectRatio: 0.62,
       ),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
