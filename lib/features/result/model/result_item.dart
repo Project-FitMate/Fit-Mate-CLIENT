@@ -7,7 +7,7 @@ class ResultItem {
     required this.brand,
     required this.price,
     required this.imageUrl,
-    required this.clothingType,
+    this.outfitPart,
     this.productUrl = '',
   });
 
@@ -16,6 +16,16 @@ class ResultItem {
   final String brand;
   final int price;
   final String imageUrl;
-  final ClothingType clothingType;
+  final OutfitPart? outfitPart;
   final String productUrl;
+
+  factory ResultItem.fromProduct(RecommendedProduct p) => ResultItem(
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        price: p.price,
+        imageUrl: p.imageUrl,
+        outfitPart: p.outfitPart,
+        productUrl: p.productUrl,
+      );
 }

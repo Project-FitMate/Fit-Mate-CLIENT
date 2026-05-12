@@ -2,16 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
+import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 
 class RecommendationHeader extends StatelessWidget {
   const RecommendationHeader({
     super.key,
-    required this.categories,
+    required this.part,
     required this.productCount,
     this.uploadedImage,
   });
 
-  final List<String> categories;
+  final OutfitPart part;
   final int productCount;
   final File? uploadedImage;
 
@@ -72,7 +73,7 @@ class RecommendationHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${categories.join(' · ')} · AI 추천순 · $productCount개',
+                  '${part.label} · AI 추천순 · $productCount개',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF9CA3AF),

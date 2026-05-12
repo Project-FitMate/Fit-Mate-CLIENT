@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:flutter/foundation.dart';
 import 'package:fit_mate_client/features/recommendation/model/recommended_product.dart';
 import 'package:fit_mate_client/features/recommendation/repository/recommendation_repository.dart';
@@ -6,56 +7,68 @@ enum RecommendationStatus { initial, loading, success, error }
 
 class RecommendationViewModel extends ChangeNotifier {
   RecommendationViewModel({
-    required this.categories,
-  }) : _repository = RecommendationRepository() {
+    required this.part,
+    required this.minPrice,
+    required this.maxPrice,
+    required this.userImageName,
+    RecommendationRepository? repository,
+  }) : _repository = repository ?? RecommendationRepository() {
     _load();
   }
 
-  final List<String> categories;
+  final OutfitPart part;
+  final int minPrice;
+  final int maxPrice;
+  final String userImageName;
   final RecommendationRepository _repository;
 
   RecommendationStatus _status = RecommendationStatus.initial;
-  List<RecommendedProduct> _allProducts = [];
+  List<RecommendedProduct> _products = [];
   String? _errorMessage;
   String _searchQuery = '';
-  String? _selectedCategory;
 
-  // clothingType별로 선택된 productId 저장 (카테고리당 1개)
-  final Map<ClothingType, String> _selectedByType = {};
+  String? _selectedId;
 
   RecommendationStatus get status => _status;
   String? get errorMessage => _errorMessage;
-  String? get selectedCategory => _selectedCategory;
-  bool get hasSelection => _selectedByType.isNotEmpty;
+  int get selectedCount => _selectedId == null ? 0 : 1;
+  bool get hasSelection => _selectedId != null;
 
-  bool isSelected(String productId) => _selectedByType.containsValue(productId);
+  RecommendedProduct? get selectedProduct {
+    if (_selectedId == null) return null;
+    return _products.firstWhere(
+      (p) => p.id == _selectedId,
+      orElse: () => _products.first,
+    );
+  }
 
+  bool isSelected(String productId) => _selectedId == productId;
+
+  // Client-side only filter; never sent to the server.
   List<RecommendedProduct> get products {
-    var filtered = _selectedCategory == null
-        ? _allProducts
-        : _allProducts.where((p) => p.clothingType.label == _selectedCategory).toList();
-
-    if (_searchQuery.isEmpty) return filtered;
+    if (_searchQuery.isEmpty) return _products;
     final q = _searchQuery.toLowerCase();
-    return filtered.where((p) {
+    return _products.where((p) {
       return p.name.toLowerCase().contains(q) ||
           p.brand.toLowerCase().contains(q) ||
           p.tags.any((t) => t.toLowerCase().contains(q));
     }).toList();
   }
 
-  void selectCategory(String? category) {
-    _selectedCategory = category;
-    notifyListeners();
-  }
-
   Future<void> _load() async {
     _status = RecommendationStatus.loading;
     notifyListeners();
     try {
-      _allProducts = await _repository.fetchByCategories(categories);
+      _products = await _repository.fetch(
+        part: part,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        userImageName: userImageName,
+      );
+      debugPrint('[RecommendationVM] loaded ${_products.length} products, searchQuery="$_searchQuery"');
       _status = RecommendationStatus.success;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[RecommendationVM] load failed: $e\n$st');
       _errorMessage = '추천 아이템을 불러오지 못했습니다.';
       _status = RecommendationStatus.error;
     }
@@ -69,22 +82,18 @@ class RecommendationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Single-selection: tapping a card replaces the current selection.
   void toggleSelection(String productId) {
-    final product = _allProducts.firstWhere((p) => p.id == productId);
-    final type = product.clothingType;
-
-    if (_selectedByType[type] == productId) {
-      // 같은 상품 다시 누르면 해제
-      _selectedByType.remove(type);
+    if (_selectedId == productId) {
+      _selectedId = null;
     } else {
-      // 같은 카테고리의 기존 선택을 덮어씀
-      _selectedByType[type] = productId;
+      _selectedId = productId;
     }
     notifyListeners();
   }
 
   void clearSelection() {
-    _selectedByType.clear();
+    _selectedId = null;
     notifyListeners();
   }
 }

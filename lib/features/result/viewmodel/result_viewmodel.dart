@@ -10,16 +10,16 @@ class ResultViewModel extends ChangeNotifier {
   final List<ResultItem> items;
 
   ResultTab _selectedTab = ResultTab.wearingItems;
-  ClothingType? _selectedCategory;
+  OutfitPart? _selectedCategory;
   String? _selectedItemId;
 
   ResultTab get selectedTab => _selectedTab;
-  ClothingType? get selectedCategory => _selectedCategory;
+  OutfitPart? get selectedCategory => _selectedCategory;
   bool isItemSelected(String id) => _selectedItemId == id;
 
   List<ResultItem> get filteredItems {
     if (_selectedCategory == null) return items;
-    return items.where((i) => i.clothingType == _selectedCategory).toList();
+    return items.where((i) => i.outfitPart == _selectedCategory).toList();
   }
 
   void selectTab(ResultTab tab) {
@@ -27,7 +27,7 @@ class ResultViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectCategory(ClothingType? category) {
+  void selectCategory(OutfitPart? category) {
     _selectedCategory = category;
     notifyListeners();
   }

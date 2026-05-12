@@ -1,13 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 class ResultPreviewCard extends StatelessWidget {
   const ResultPreviewCard({
     super.key,
-    required this.generatedImageUrl,
+    required this.generatedImage,
     required this.onRegenerate,
   });
 
-  final String generatedImageUrl;
+  final Uint8List? generatedImage;
   final VoidCallback onRegenerate;
 
   @override
@@ -26,13 +28,13 @@ class ResultPreviewCard extends StatelessWidget {
       child: Stack(
         children: [
           Center(
-            child: generatedImageUrl.isNotEmpty
+            child: generatedImage != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(32),
-                    child: Image.network(
-                      generatedImageUrl,
+                    child: Image.memory(
+                      generatedImage!,
                       fit: BoxFit.contain,
-                      height: 192,
+                      height: 240,
                     ),
                   )
                 : const Icon(
