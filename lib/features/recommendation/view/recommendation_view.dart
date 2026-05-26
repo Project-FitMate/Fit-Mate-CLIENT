@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
@@ -25,7 +25,7 @@ class RecommendationView extends StatefulWidget {
   final int minPrice;
   final int maxPrice;
   final String userImageName;
-  final File? uploadedImage;
+  final Uint8List? uploadedImage;
 
   @override
   State<RecommendationView> createState() => _RecommendationViewState();

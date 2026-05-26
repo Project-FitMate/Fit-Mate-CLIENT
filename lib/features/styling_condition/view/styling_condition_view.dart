@@ -40,7 +40,7 @@ class _StylingConditionViewState extends State<StylingConditionView> {
           minPrice: c.minPrice,
           maxPrice: c.maxPrice,
           userImageName: widget.photo.userImageName,
-          uploadedImage: widget.photo.file,
+          uploadedImage: widget.photo.bytes,
         ),
       ),
     );
@@ -75,7 +75,7 @@ class _StylingConditionViewState extends State<StylingConditionView> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             children: [
-              UploadStatusCard(photoFile: widget.photo.file),
+              UploadStatusCard(photoBytes: widget.photo.bytes),
               const SizedBox(height: 20),
               const _SectionTitle(
                 icon: Icons.search_rounded,

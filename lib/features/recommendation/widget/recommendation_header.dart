@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
@@ -14,7 +14,7 @@ class RecommendationHeader extends StatelessWidget {
 
   final OutfitPart part;
   final int productCount;
-  final File? uploadedImage;
+  final Uint8List? uploadedImage;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class RecommendationHeader extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: uploadedImage != null
-                ? Image.file(uploadedImage!, fit: BoxFit.cover)
+                ? Image.memory(uploadedImage!, fit: BoxFit.cover)
                 : const Icon(
                     Icons.person_outline_rounded,
                     color: Color(0xFFA08060),
