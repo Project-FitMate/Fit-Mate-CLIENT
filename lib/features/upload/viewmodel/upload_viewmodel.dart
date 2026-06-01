@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -50,16 +48,20 @@ class UploadViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final file = File(picked.path);
-      debugPrint('[UploadViewModel] uploading path=${file.path} size=${await file.length()}');
+      final bytes = await picked.readAsBytes();
+      debugPrint('[UploadViewModel] uploading name=${picked.name} size=${bytes.lengthInBytes}');
       final response = await _apiClient.postMultipartFile(
         '/user/image',
         field: 'image',
-        file: file,
+        file: picked,
       );
       debugPrint('[UploadViewModel] upload response=$response');
       final filename = (response as Map<String, dynamic>)['filename'] as String;
-      _photo = UploadPhoto(file: file, userImageName: filename);
+      _photo = UploadPhoto(
+        bytes: bytes,
+        fileName: picked.name,
+        userImageName: filename,
+      );
       _status = UploadStatus.ready;
     } catch (e, st) {
       debugPrint('[UploadViewModel] upload failed: $e\n$st');

@@ -1,11 +1,11 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
 class UploadStatusCard extends StatelessWidget {
-  const UploadStatusCard({super.key, this.photoFile});
+  const UploadStatusCard({super.key, this.photoBytes});
 
-  final File? photoFile;
+  final Uint8List? photoBytes;
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +27,8 @@ class UploadStatusCard extends StatelessWidget {
               border: Border.all(color: const Color(0xFFFF7A90), width: 1.5),
             ),
             clipBehavior: Clip.antiAlias,
-            child: photoFile != null
-                ? Image.file(photoFile!, fit: BoxFit.cover)
+            child: photoBytes != null
+                ? Image.memory(photoBytes!, fit: BoxFit.cover)
                 : const Center(
                     child: Text('🧍', style: TextStyle(fontSize: 28)),
                   ),

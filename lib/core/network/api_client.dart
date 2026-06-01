@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:fit_mate_client/core/config/app_config.dart';
 
@@ -42,15 +42,15 @@ class ApiClient {
   Future<dynamic> postMultipartFile(
     String path, {
     required String field,
-    required File file,
+    required XFile file,
   }) async {
     final request = http.MultipartRequest('POST', _uri(path));
-    // Without an explicit contentType, http defaults to application/octet-stream,
-    // which the server's mimetype whitelist (jpeg/png/webp) rejects.
-    request.files.add(await http.MultipartFile.fromPath(
+    final bytes = await file.readAsBytes();
+    request.files.add(http.MultipartFile.fromBytes(
       field,
-      file.path,
-      contentType: _imageMediaType(file.path),
+      bytes,
+      filename: file.name,
+      contentType: _imageMediaType(file.name),
     ));
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
