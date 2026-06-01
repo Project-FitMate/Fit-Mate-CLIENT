@@ -35,6 +35,8 @@
 	<string>전신 사진을 촬영하여 가상 피팅에 사용합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>전신 사진을 선택하여 가상 피팅에 사용합니다.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>가상 피팅 결과 이미지를 사진 앨범에 저장합니다.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
