@@ -8,10 +8,12 @@ class ResultPreviewCard extends StatelessWidget {
     super.key,
     required this.generatedImage,
     required this.onRegenerate,
+    this.onTapImage,
   });
 
   final Uint8List? generatedImage;
   final VoidCallback onRegenerate;
+  final VoidCallback? onTapImage;
 
   Future<void> _save(BuildContext context) async {
     final image = generatedImage;
@@ -27,19 +29,6 @@ class ResultPreviewCard extends StatelessWidget {
         const SnackBar(content: Text('이미지 저장에 실패했습니다.')),
       );
     }
-  }
-
-  void _openZoom(BuildContext context) {
-    final image = generatedImage;
-    if (image == null) return;
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.black,
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _ZoomView(image: image),
-      ),
-    );
   }
 
   @override
@@ -59,12 +48,15 @@ class ResultPreviewCard extends StatelessWidget {
         children: [
           Center(
             child: generatedImage != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: Image.memory(
-                      generatedImage!,
-                      fit: BoxFit.contain,
-                      height: 240,
+                ? GestureDetector(
+                    onTap: onTapImage,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(32),
+                      child: Image.memory(
+                        generatedImage!,
+                        fit: BoxFit.contain,
+                        height: 240,
+                      ),
                     ),
                   )
                 : const Icon(
@@ -106,7 +98,7 @@ class ResultPreviewCard extends StatelessWidget {
               child: _CircleIconButton(
                 icon: Icons.zoom_in_rounded,
                 tooltip: '확대',
-                onTap: () => _openZoom(context),
+                onTap: () => onTapImage?.call(),
               ),
             ),
             Positioned(
@@ -156,37 +148,3 @@ class _CircleIconButton extends StatelessWidget {
   }
 }
 
-class _ZoomView extends StatelessWidget {
-  const _ZoomView({required this.image});
-
-  final Uint8List image;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: InteractiveViewer(
-              minScale: 1,
-              maxScale: 5,
-              child: Center(
-                child: Image.memory(image, fit: BoxFit.contain),
-              ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 12,
-            child: _CircleIconButton(
-              icon: Icons.close_rounded,
-              tooltip: '닫기',
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

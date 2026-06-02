@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +10,11 @@ import 'package:fit_mate_client/features/upload/model/upload_photo.dart';
 // TODO: rework with a fake photo + mocked repository.
 void main() {
   testWidgets('renders styling condition layout', (WidgetTester tester) async {
-    final photo = UploadPhoto(file: File('/tmp/x'), userImageName: 'x');
+    final photo = UploadPhoto(
+      bytes: Uint8List(0),
+      fileName: 'x.png',
+      userImageName: 'x',
+    );
     await tester.pumpWidget(MaterialApp(home: StylingConditionView(photo: photo)));
     expect(find.text('착용 조건 설정'), findsOneWidget);
   }, skip: true);

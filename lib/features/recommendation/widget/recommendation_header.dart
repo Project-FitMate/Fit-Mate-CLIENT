@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
@@ -7,14 +7,14 @@ import 'package:fit_mate_client/features/recommendation/model/recommended_produc
 class RecommendationHeader extends StatelessWidget {
   const RecommendationHeader({
     super.key,
-    required this.part,
+    required this.parts,
     required this.productCount,
     this.uploadedImage,
   });
 
-  final OutfitPart part;
+  final List<OutfitPart> parts;
   final int productCount;
-  final File? uploadedImage;
+  final Uint8List? uploadedImage;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class RecommendationHeader extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: uploadedImage != null
-                ? Image.file(uploadedImage!, fit: BoxFit.cover)
+                ? Image.memory(uploadedImage!, fit: BoxFit.cover)
                 : const Icon(
                     Icons.person_outline_rounded,
                     color: Color(0xFFA08060),
@@ -73,7 +73,7 @@ class RecommendationHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${part.label} · AI 추천순 · $productCount개',
+                  '${parts.map((e) => e.label).join('·')} · AI 추천순 · $productCount개',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF9CA3AF),

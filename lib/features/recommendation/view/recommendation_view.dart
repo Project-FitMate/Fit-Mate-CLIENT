@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/constants/color_constants.dart';
@@ -7,6 +7,7 @@ import 'package:fit_mate_client/features/recommendation/model/recommended_produc
 import 'package:fit_mate_client/features/recommendation/viewmodel/recommendation_viewmodel.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_action_button.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_card.dart';
+import 'package:fit_mate_client/features/recommendation/widget/recommendation_category_chips.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_header.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_search_bar.dart';
 import 'package:fit_mate_client/features/recommendation/widget/recommendation_selection_banner.dart';
@@ -14,18 +15,18 @@ import 'package:fit_mate_client/features/recommendation/widget/recommendation_se
 class RecommendationView extends StatefulWidget {
   const RecommendationView({
     super.key,
-    required this.part,
+    required this.parts,
     required this.minPrice,
     required this.maxPrice,
     required this.userImageName,
     this.uploadedImage,
   });
 
-  final OutfitPart part;
+  final List<OutfitPart> parts;
   final int minPrice;
   final int maxPrice;
   final String userImageName;
-  final File? uploadedImage;
+  final Uint8List? uploadedImage;
 
   @override
   State<RecommendationView> createState() => _RecommendationViewState();
@@ -39,7 +40,7 @@ class _RecommendationViewState extends State<RecommendationView> {
   void initState() {
     super.initState();
     _viewModel = RecommendationViewModel(
-      part: widget.part,
+      parts: widget.parts,
       minPrice: widget.minPrice,
       maxPrice: widget.maxPrice,
       userImageName: widget.userImageName,
@@ -55,15 +56,16 @@ class _RecommendationViewState extends State<RecommendationView> {
   }
 
   void _onProceed() {
-    final selected = _viewModel.selectedProduct;
-    if (selected == null) return;
+    final selected = _viewModel.selectedProducts;
+    if (selected.isEmpty) return;
+    final outfitImageUrls = selected.map((p) => p.imageUrl).toList();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => LoadingView(
           userImageName: widget.userImageName,
-          outfitImageUrl: selected.imageUrl,
-          selectedProduct: selected,
+          outfitImageUrls: outfitImageUrls,
+          selectedProducts: selected,
         ),
       ),
     );
@@ -80,13 +82,18 @@ class _RecommendationViewState extends State<RecommendationView> {
             return Column(
               children: [
                 RecommendationHeader(
-                  part: widget.part,
+                  parts: widget.parts,
                   uploadedImage: widget.uploadedImage,
-                  productCount: _viewModel.products.length,
+                  productCount: _viewModel.totalCount,
                 ),
                 RecommendationSearchBar(
                   controller: _searchController,
                   onChanged: _viewModel.updateSearchQuery,
+                ),
+                RecommendationCategoryChips(
+                  parts: widget.parts,
+                  selectedCategory: _viewModel.selectedCategory,
+                  onSelect: _viewModel.selectCategory,
                 ),
                 Expanded(
                   child: switch (_viewModel.status) {

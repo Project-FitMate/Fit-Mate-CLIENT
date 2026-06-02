@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fit_mate_client/core/theme/app_theme.dart';
-import 'package:fit_mate_client/features/upload/view/upload_view.dart';
+import 'package:fit_mate_client/features/home/view/home_gate.dart';
 
 void main() {
   runApp(const FitMateApp());
@@ -15,7 +15,8 @@ class FitMateApp extends StatelessWidget {
       title: 'Fit Mate',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const UploadView(),
+      navigatorObservers: [homeRouteObserver],
+      home: const HomeGate(),
     );
   }
 }
