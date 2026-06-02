@@ -9,16 +9,23 @@ import 'package:fit_mate_client/features/result/widget/result_category_chips.dar
 import 'package:fit_mate_client/features/result/widget/result_header.dart';
 import 'package:fit_mate_client/features/result/widget/result_item_card.dart';
 import 'package:fit_mate_client/features/result/widget/result_preview_card.dart';
+import 'package:fit_mate_client/features/saved/model/saved_fitting.dart';
+import 'package:fit_mate_client/features/saved/repository/saved_fitting_store.dart';
+import 'package:fit_mate_client/shared/widgets/zoomable_image_view.dart';
 
 class ResultView extends StatefulWidget {
   const ResultView({
     super.key,
     this.generatedImageBase64 = '',
     this.items = const <ResultItem>[],
+    this.autoSave = false,
   });
 
   final String generatedImageBase64;
   final List<ResultItem> items;
+  // True for a freshly generated result (auto-saved to the gallery on open).
+  // False when re-opening an already-saved fitting from the gallery.
+  final bool autoSave;
 
   @override
   State<ResultView> createState() => _ResultViewState();
@@ -39,6 +46,31 @@ class _ResultViewState extends State<ResultView> {
         _decodedImage = null;
       }
     }
+    if (widget.autoSave && _decodedImage != null) {
+      _saveToGallery();
+    }
+  }
+
+  Future<void> _saveToGallery() async {
+    final now = DateTime.now();
+    await SavedFittingStore().save(
+      SavedFitting(
+        id: now.microsecondsSinceEpoch.toString(),
+        createdAt: now,
+        imageBase64: widget.generatedImageBase64,
+        items: widget.items,
+      ),
+    );
+  }
+
+  void _openZoom() {
+    if (_decodedImage == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => ZoomableImageView(imageBytes: _decodedImage!),
+      ),
+    );
   }
 
   @override
@@ -66,6 +98,7 @@ class _ResultViewState extends State<ResultView> {
                     child: ResultPreviewCard(
                       generatedImage: _decodedImage,
                       onRegenerate: () {},
+                      onTapImage: _openZoom,
                     ),
                   ),
                 ),

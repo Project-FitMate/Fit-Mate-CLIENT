@@ -10,13 +10,13 @@ class LoadingView extends StatefulWidget {
   const LoadingView({
     super.key,
     required this.userImageName,
-    required this.outfitImageUrl,
-    required this.selectedProduct,
+    required this.outfitImageUrls,
+    required this.selectedProducts,
   });
 
   final String userImageName;
-  final String outfitImageUrl;
-  final RecommendedProduct selectedProduct;
+  final List<String> outfitImageUrls;
+  final List<RecommendedProduct> selectedProducts;
 
   @override
   State<LoadingView> createState() => _LoadingViewState();
@@ -47,7 +47,7 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
 
     _viewModel = LoadingViewModel(
       userImageName: widget.userImageName,
-      outfitImageUrl: widget.outfitImageUrl,
+      outfitImageUrls: widget.outfitImageUrls,
     );
 
     _loopController = AnimationController(
@@ -97,7 +97,10 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
         MaterialPageRoute(
           builder: (_) => ResultView(
             generatedImageBase64: _viewModel.result!.imageBase64,
-            items: [ResultItem.fromProduct(widget.selectedProduct)],
+            items: widget.selectedProducts
+                .map(ResultItem.fromProduct)
+                .toList(),
+            autoSave: true,
           ),
         ),
       );
