@@ -8,21 +8,19 @@ class RecommendationRepository {
   final ApiClient _apiClient;
 
   Future<List<RecommendedProduct>> fetch({
-    required OutfitPart part,
+    required List<OutfitPart> parts,
     required int minPrice,
     required int maxPrice,
     required String userImageName,
   }) async {
     final body = {
-      'part': part.wire,
+      'parts': parts.map((e) => e.wire).toList(),
       'minPrice': minPrice,
       'maxPrice': maxPrice,
       'userImageName': userImageName,
     };
     final data = await _apiClient.postJson('/outfit', body);
     final list = (data as List).cast<Map<String, dynamic>>();
-    return list
-        .map((item) => RecommendedProduct.fromJson(item, part: part))
-        .toList();
+    return list.map((item) => RecommendedProduct.fromJson(item)).toList();
   }
 }

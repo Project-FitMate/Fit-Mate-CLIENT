@@ -7,7 +7,7 @@ enum RecommendationStatus { initial, loading, success, error }
 
 class RecommendationViewModel extends ChangeNotifier {
   RecommendationViewModel({
-    required this.part,
+    required this.parts,
     required this.minPrice,
     required this.maxPrice,
     required this.userImageName,
@@ -16,7 +16,7 @@ class RecommendationViewModel extends ChangeNotifier {
     _load();
   }
 
-  final OutfitPart part;
+  final List<OutfitPart> parts;
   final int minPrice;
   final int maxPrice;
   final String userImageName;
@@ -27,32 +27,48 @@ class RecommendationViewModel extends ChangeNotifier {
   String? _errorMessage;
   String _searchQuery = '';
 
-  String? _selectedId;
+  // Per-part selection: key=product's outfitPart, value=productId.
+  // Picking another product in the same part replaces that part's selection.
+  final Map<OutfitPart?, String> _selectedByPart = {};
+  // Category filter chip; null means "전체". Filters the list by item part.
+  OutfitPart? _selectedCategory;
 
   RecommendationStatus get status => _status;
   String? get errorMessage => _errorMessage;
-  int get selectedCount => _selectedId == null ? 0 : 1;
-  bool get hasSelection => _selectedId != null;
+  // Now counts the number of selected parts.
+  int get selectedCount => _selectedByPart.length;
+  bool get hasSelection => _selectedByPart.isNotEmpty;
+  OutfitPart? get selectedCategory => _selectedCategory;
+  // Total loaded items, ignoring the active category/search filter.
+  int get totalCount => _products.length;
 
-  RecommendedProduct? get selectedProduct {
-    if (_selectedId == null) return null;
-    return _products.firstWhere(
-      (p) => p.id == _selectedId,
-      orElse: () => _products.first,
-    );
+  // Maps the currently selected product ids back to products.
+  List<RecommendedProduct> get selectedProducts {
+    final ids = _selectedByPart.values.toSet();
+    return _products.where((p) => ids.contains(p.id)).toList();
   }
 
-  bool isSelected(String productId) => _selectedId == productId;
+  bool isSelected(String productId) => _selectedByPart.values.contains(productId);
 
   // Client-side only filter; never sent to the server.
   List<RecommendedProduct> get products {
-    if (_searchQuery.isEmpty) return _products;
+    var list = _products;
+    if (_selectedCategory != null) {
+      list = list.where((p) => p.outfitPart == _selectedCategory).toList();
+    }
+    if (_searchQuery.isEmpty) return list;
     final q = _searchQuery.toLowerCase();
-    return _products.where((p) {
+    return list.where((p) {
       return p.name.toLowerCase().contains(q) ||
           p.brand.toLowerCase().contains(q) ||
           p.tags.any((t) => t.toLowerCase().contains(q));
     }).toList();
+  }
+
+  // null clears the filter (전체).
+  void selectCategory(OutfitPart? category) {
+    _selectedCategory = category;
+    notifyListeners();
   }
 
   Future<void> _load() async {
@@ -60,7 +76,7 @@ class RecommendationViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       _products = await _repository.fetch(
-        part: part,
+        parts: parts,
         minPrice: minPrice,
         maxPrice: maxPrice,
         userImageName: userImageName,
@@ -82,18 +98,24 @@ class RecommendationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Single-selection: tapping a card replaces the current selection.
+  // Per-part selection: tapping a card toggles it within its outfit part.
+  // Tapping another product in the same part replaces that part's selection.
   void toggleSelection(String productId) {
-    if (_selectedId == productId) {
-      _selectedId = null;
+    final product = _products.firstWhere(
+      (p) => p.id == productId,
+      orElse: () => _products.first,
+    );
+    final part = product.outfitPart;
+    if (_selectedByPart[part] == productId) {
+      _selectedByPart.remove(part);
     } else {
-      _selectedId = productId;
+      _selectedByPart[part] = productId;
     }
     notifyListeners();
   }
 
   void clearSelection() {
-    _selectedId = null;
+    _selectedByPart.clear();
     notifyListeners();
   }
 }

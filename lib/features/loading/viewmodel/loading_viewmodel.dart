@@ -9,12 +9,12 @@ enum FittingStatus { loading, success, error }
 class LoadingViewModel extends ChangeNotifier {
   LoadingViewModel({
     required this.userImageName,
-    required this.outfitImageUrl,
+    required this.outfitImageUrls,
     FittingRepository? repository,
   }) : _repository = repository ?? FittingRepository();
 
   final String userImageName;
-  final String outfitImageUrl;
+  final List<String> outfitImageUrls;
   final FittingRepository _repository;
 
   static const List<Map<String, String>> _sequences = [
@@ -48,7 +48,7 @@ class LoadingViewModel extends ChangeNotifier {
     try {
       _result = await _repository.create(
         userImageName: userImageName,
-        outfitImageUrl: outfitImageUrl,
+        outfitImageUrls: outfitImageUrls,
       );
       _status = FittingStatus.success;
     } catch (e) {

@@ -9,14 +9,14 @@ class FittingRepository {
 
   Future<TryOnResult> create({
     required String userImageName,
-    required String outfitImageUrl,
+    required List<String> outfitImageUrls,
   }) async {
     final deviceId = await DeviceId.get();
     final data = await _apiClient.postJson(
       '/fitting',
       {
         'userImageName': userImageName,
-        'outfitImageUrl': outfitImageUrl,
+        'outfitImageUrls': outfitImageUrls,
       },
       headers: {'device-id': deviceId},
     );
