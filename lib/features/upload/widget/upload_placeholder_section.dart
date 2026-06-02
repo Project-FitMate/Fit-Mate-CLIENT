@@ -24,7 +24,7 @@ class UploadPlaceholderSection extends StatelessWidget {
         children: [
           Expanded(
             child: _UploadOptionCard(
-              label: cameraSelected ? '사진 업로드 완료' : '카메라 촬영',
+              label: cameraSelected ? '사진 업로드\n완료' : '카메라 촬영',
               icon: Icons.camera_alt_rounded,
               isSelected: cameraSelected,
               onTap: onCameraTap,
@@ -33,7 +33,7 @@ class UploadPlaceholderSection extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: _UploadOptionCard(
-              label: gallerySelected ? '사진 업로드 완료' : '내 사진 업로드',
+              label: gallerySelected ? '사진 업로드\n완료' : '내 사진 업로드',
               icon: Icons.photo_library_rounded,
               isSelected: gallerySelected,
               onTap: onGalleryTap,

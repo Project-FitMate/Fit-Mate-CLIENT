@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gal/gal.dart';
 
 class ResultPreviewCard extends StatelessWidget {
   const ResultPreviewCard({
@@ -13,6 +14,22 @@ class ResultPreviewCard extends StatelessWidget {
   final Uint8List? generatedImage;
   final VoidCallback onRegenerate;
   final VoidCallback? onTapImage;
+
+  Future<void> _save(BuildContext context) async {
+    final image = generatedImage;
+    if (image == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await Gal.putImageBytes(image, name: 'fitmate_${DateTime.now().millisecondsSinceEpoch}');
+      messenger.showSnackBar(
+        const SnackBar(content: Text('사진 앨범에 저장했습니다.')),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('이미지 저장에 실패했습니다.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,36 +65,6 @@ class ResultPreviewCard extends StatelessWidget {
                     color: Color(0xFFBDBDBD),
                   ),
           ),
-          if (generatedImage != null)
-            Positioned(
-              bottom: 12,
-              right: 16,
-              child: GestureDetector(
-                onTap: onTapImage,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.zoom_in_rounded, size: 14, color: Colors.white),
-                      SizedBox(width: 4),
-                      Text(
-                        '확대',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           Positioned(
             top: 16,
             left: 16,
@@ -104,8 +91,60 @@ class ResultPreviewCard extends StatelessWidget {
               ),
             ),
           ),
+          if (generatedImage != null) ...[
+            Positioned(
+              bottom: 16,
+              left: 16,
+              child: _CircleIconButton(
+                icon: Icons.zoom_in_rounded,
+                tooltip: '확대',
+                onTap: () => onTapImage?.call(),
+              ),
+            ),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: _CircleIconButton(
+                icon: Icons.download_rounded,
+                tooltip: '다운로드',
+                onTap: () => _save(context),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
+
+class _CircleIconButton extends StatelessWidget {
+  const _CircleIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withValues(alpha: 0.6),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Tooltip(
+          message: tooltip,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Icon(icon, size: 22, color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

@@ -10,7 +10,7 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: RecommendationView(
-          part: OutfitPart.top,
+          parts: [OutfitPart.top],
           minPrice: 0,
           maxPrice: 100000,
           userImageName: 'placeholder.jpg',
