@@ -2,27 +2,27 @@ import 'package:fit_mate_client/features/recommendation/model/recommended_produc
 
 class StylingCondition {
   const StylingCondition({
-    required this.category,
+    required this.categories,
     required this.minPrice,
     required this.maxPrice,
     required this.sortOption,
   });
 
-  // Single-selection category, aligned with the LLM/server OutfitPart enum.
-  final OutfitPart category;
+  // Multi-selection categories, aligned with the LLM/server OutfitPart enum.
+  final Set<OutfitPart> categories;
   final int minPrice;
   final int maxPrice;
   // Client-side only display option; not sent to the server.
   final String sortOption;
 
   StylingCondition copyWith({
-    OutfitPart? category,
+    Set<OutfitPart>? categories,
     int? minPrice,
     int? maxPrice,
     String? sortOption,
   }) {
     return StylingCondition(
-      category: category ?? this.category,
+      categories: categories ?? this.categories,
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
       sortOption: sortOption ?? this.sortOption,

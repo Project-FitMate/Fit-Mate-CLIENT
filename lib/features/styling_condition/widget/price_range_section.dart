@@ -30,22 +30,41 @@ class PriceRangeSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                _formatPrice(minPrice),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
-              ),
-              const Spacer(),
-              const Text(
-                '선택 범위',
-                style: TextStyle(
-                  color: Color(0xFFFF7A90),
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _formatPrice(minPrice),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
-              const Spacer(),
-              Text(
-                _formatPrice(maxPrice),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  '선택 범위',
+                  style: TextStyle(
+                    color: Color(0xFFFF7A90),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    _formatPrice(maxPrice),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -63,7 +82,15 @@ class PriceRangeSection extends StatelessWidget {
               values: RangeValues(minPrice.toDouble(), maxPrice.toDouble()),
               min: minAllowedPrice.toDouble(),
               max: maxAllowedPrice.toDouble(),
-              onChanged: onChanged,
+              // Snap to 1000원 steps: (max - min) / 1000 구간.
+              divisions: ((maxAllowedPrice - minAllowedPrice) / 1000).round(),
+              labels: RangeLabels(_formatPrice(minPrice), _formatPrice(maxPrice)),
+              onChanged: (values) => onChanged(
+                RangeValues(
+                  _roundToStep(values.start),
+                  _roundToStep(values.end),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -91,6 +118,9 @@ class PriceRangeSection extends StatelessWidget {
     );
   }
 }
+
+// Normalize a slider value to the nearest 1000원 step.
+double _roundToStep(double value) => (value / 1000).round() * 1000;
 
 String _formatPrice(int price) {
   final digits = price.toString();

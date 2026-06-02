@@ -7,12 +7,12 @@ import 'package:fit_mate_client/features/recommendation/model/recommended_produc
 class RecommendationHeader extends StatelessWidget {
   const RecommendationHeader({
     super.key,
-    required this.part,
+    required this.parts,
     required this.productCount,
     this.uploadedImage,
   });
 
-  final OutfitPart part;
+  final List<OutfitPart> parts;
   final int productCount;
   final Uint8List? uploadedImage;
 
@@ -73,7 +73,7 @@ class RecommendationHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${part.label} · AI 추천순 · $productCount개',
+                  '${parts.map((e) => e.label).join('·')} · AI 추천순 · $productCount개',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF9CA3AF),

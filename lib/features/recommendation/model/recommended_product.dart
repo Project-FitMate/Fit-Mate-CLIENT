@@ -18,6 +18,15 @@ enum OutfitPart {
       orElse: () => OutfitPart.top,
     );
   }
+
+  // Reverse lookup from the server/LLM wire value (e.g. "TOP").
+  static OutfitPart? fromWire(String? wire) {
+    if (wire == null) return null;
+    for (final part in OutfitPart.values) {
+      if (part.wire == wire) return part;
+    }
+    return null;
+  }
 }
 
 class RecommendedProduct {
@@ -54,7 +63,9 @@ class RecommendedProduct {
       price: (json['price'] as num?)?.toInt() ?? 0,
       imageUrl: (json['image'] ?? '') as String,
       productUrl: link,
-      outfitPart: part,
+      // Prefer the per-item part tag from the response; fall back to the
+      // caller-provided part if the field is absent.
+      outfitPart: OutfitPart.fromWire(json['part'] as String?) ?? part,
     );
   }
 }
