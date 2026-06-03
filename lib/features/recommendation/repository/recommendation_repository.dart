@@ -12,12 +12,14 @@ class RecommendationRepository {
     required int minPrice,
     required int maxPrice,
     required String userImageName,
+    String? keyword,
   }) async {
     final body = {
       'parts': parts.map((e) => e.wire).toList(),
       'minPrice': minPrice,
       'maxPrice': maxPrice,
       'userImageName': userImageName,
+      if (keyword != null && keyword.trim().isNotEmpty) 'keyword': keyword.trim(),
     };
     final data = await _apiClient.postJson('/outfit', body);
     final list = (data as List).cast<Map<String, dynamic>>();

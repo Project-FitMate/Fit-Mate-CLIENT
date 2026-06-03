@@ -6,6 +6,7 @@ import 'package:fit_mate_client/features/styling_condition/widget/condition_filt
 import 'package:fit_mate_client/features/styling_condition/widget/price_range_section.dart';
 import 'package:fit_mate_client/features/styling_condition/widget/upload_status_card.dart';
 import 'package:fit_mate_client/features/upload/model/upload_photo.dart';
+import 'package:fit_mate_client/features/upload/viewmodel/upload_viewmodel.dart';
 import 'package:fit_mate_client/shared/widgets/primary_action_button.dart';
 
 class StylingConditionView extends StatefulWidget {
@@ -19,17 +20,57 @@ class StylingConditionView extends StatefulWidget {
 
 class _StylingConditionViewState extends State<StylingConditionView> {
   late final StylingConditionViewModel _viewModel;
+  late final UploadViewModel _uploadVm;
+  late UploadPhoto _photo;
 
   @override
   void initState() {
     super.initState();
     _viewModel = StylingConditionViewModel();
+    _uploadVm = UploadViewModel();
+    _photo = widget.photo;
   }
 
   @override
   void dispose() {
     _viewModel.dispose();
+    _uploadVm.dispose();
     super.dispose();
+  }
+
+  // Re-pick + re-upload a photo, then swap it (and its userImageName) in place.
+  Future<void> _changePhoto() async {
+    final source = await showModalBottomSheet<UploadSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: const Text('카메라로 촬영'),
+              onTap: () => Navigator.pop(ctx, UploadSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('갤러리에서 선택'),
+              onTap: () => Navigator.pop(ctx, UploadSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    await _uploadVm.selectSource(source);
+    if (!mounted) return;
+    final photo = _uploadVm.photo;
+    if (_uploadVm.hasPhoto && photo != null) {
+      setState(() => _photo = photo);
+    } else if (_uploadVm.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_uploadVm.errorMessage!)),
+      );
+    }
   }
 
   void _goToRecommendation() {
@@ -40,8 +81,9 @@ class _StylingConditionViewState extends State<StylingConditionView> {
           parts: c.categories.toList(),
           minPrice: c.minPrice,
           maxPrice: c.maxPrice,
-          userImageName: widget.photo.userImageName,
-          uploadedImage: widget.photo.bytes,
+          userImageName: _photo.userImageName,
+          uploadedImage: _photo.bytes,
+          sortOption: c.sortOption,
         ),
       ),
     );
@@ -77,29 +119,11 @@ class _StylingConditionViewState extends State<StylingConditionView> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             children: [
-              UploadStatusCard(photoBytes: widget.photo.bytes),
-              const SizedBox(height: 16),
-              _SectionCard(
-                icon: Icons.search_rounded,
-                label: '제품 검색',
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: '브랜드, 제품명으로 검색...',
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: const Color(0xFFF6F7FB),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFE8EAF2)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFE8EAF2)),
-                    ),
-                  ),
-                ),
+              UploadStatusCard(
+                photoBytes: _photo.bytes,
+                onChangePhoto: _changePhoto,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               _SectionCard(
                 icon: Icons.checkroom_rounded,
                 label: '착용 부위 선택',

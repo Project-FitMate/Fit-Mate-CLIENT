@@ -20,6 +20,7 @@ class RecommendationView extends StatefulWidget {
     required this.maxPrice,
     required this.userImageName,
     this.uploadedImage,
+    this.sortOption = 'AI 추천순',
   });
 
   final List<OutfitPart> parts;
@@ -27,6 +28,7 @@ class RecommendationView extends StatefulWidget {
   final int maxPrice;
   final String userImageName;
   final Uint8List? uploadedImage;
+  final String sortOption;
 
   @override
   State<RecommendationView> createState() => _RecommendationViewState();
@@ -44,6 +46,7 @@ class _RecommendationViewState extends State<RecommendationView> {
       minPrice: widget.minPrice,
       maxPrice: widget.maxPrice,
       userImageName: widget.userImageName,
+      sortOption: widget.sortOption,
     );
     _searchController = TextEditingController();
   }
@@ -69,6 +72,15 @@ class _RecommendationViewState extends State<RecommendationView> {
         ),
       ),
     );
+  }
+
+  // No client-side match for the typed query → ask the server to search again
+  // with that keyword (image analysis + keyword, limited to the selected parts).
+  void _searchOnServer() {
+    final q = _searchController.text.trim();
+    if (q.isEmpty) return;
+    _searchController.clear();
+    _viewModel.searchOnServer(q);
   }
 
   @override
@@ -106,6 +118,7 @@ class _RecommendationViewState extends State<RecommendationView> {
                       ),
                     RecommendationStatus.success => _ProductList(
                         viewModel: _viewModel,
+                        onSearchAnew: _searchOnServer,
                       ),
                   },
                 ),
@@ -126,25 +139,39 @@ class _RecommendationViewState extends State<RecommendationView> {
 }
 
 class _ProductList extends StatelessWidget {
-  const _ProductList({required this.viewModel});
+  const _ProductList({required this.viewModel, required this.onSearchAnew});
 
   final RecommendationViewModel viewModel;
+  final VoidCallback onSearchAnew;
 
   @override
   Widget build(BuildContext context) {
     final products = viewModel.products;
 
     if (products.isEmpty) {
-      return const Center(
+      final q = viewModel.searchQuery.trim();
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.checkroom_outlined, size: 64, color: Color(0xFFCDD2DA)),
-            SizedBox(height: 16),
+            const Icon(Icons.checkroom_outlined, size: 64, color: Color(0xFFCDD2DA)),
+            const SizedBox(height: 16),
             Text(
-              '추천 아이템이 없습니다',
-              style: TextStyle(fontSize: 16, color: Color(0xFF9CA3AF)),
+              q.isEmpty ? '추천 아이템이 없습니다' : "'$q' 검색 결과가 없습니다",
+              style: const TextStyle(fontSize: 16, color: Color(0xFF9CA3AF)),
             ),
+            if (q.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: onSearchAnew,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorConstants.coral,
+                  foregroundColor: Colors.white,
+                ),
+                icon: const Icon(Icons.search_rounded, size: 18),
+                label: Text("'$q'(으)로 새로 검색"),
+              ),
+            ],
           ],
         ),
       );

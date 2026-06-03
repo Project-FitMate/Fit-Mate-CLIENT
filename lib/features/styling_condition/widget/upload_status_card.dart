@@ -3,9 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class UploadStatusCard extends StatelessWidget {
-  const UploadStatusCard({super.key, this.photoBytes});
+  const UploadStatusCard({super.key, this.photoBytes, this.onChangePhoto});
 
   final Uint8List? photoBytes;
+  final VoidCallback? onChangePhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +35,11 @@ class UploadStatusCard extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
                     Text(
                       '사진 업로드 완료',
@@ -56,20 +57,25 @@ class UploadStatusCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 6),
-                Text(
+                const SizedBox(height: 6),
+                const Text(
                   '피부톤 · 체형 분석 준비됨\nAI가 자동으로 체형을 인식합니다',
                   style: TextStyle(
                     color: Color(0xFF717686),
                     height: 1.4,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  '사진 변경',
-                  style: TextStyle(
-                    color: Color(0xFFFF617E),
-                    fontWeight: FontWeight.w700,
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: onChangePhoto,
+                  child: const Text(
+                    '사진 변경',
+                    style: TextStyle(
+                      color: Color(0xFFFF617E),
+                      fontWeight: FontWeight.w700,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Color(0xFFFF617E),
+                    ),
                   ),
                 ),
               ],

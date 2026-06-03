@@ -5,19 +5,18 @@ import 'package:fit_mate_client/features/recommendation/model/recommended_produc
 class ResultCategoryChips extends StatelessWidget {
   const ResultCategoryChips({
     super.key,
+    required this.availableParts,
     required this.selectedCategory,
     required this.onSelect,
   });
 
+  final List<OutfitPart> availableParts;
   final OutfitPart? selectedCategory;
   final ValueChanged<OutfitPart?> onSelect;
 
   @override
   Widget build(BuildContext context) {
-    final categories = <OutfitPart?>[
-      null,
-      ...OutfitPart.values.where((part) => part != OutfitPart.full),
-    ];
+    final categories = <OutfitPart?>[null, ...availableParts];
     return SizedBox(
       height: 52,
       child: ListView.separated(

@@ -5,8 +5,10 @@ import 'package:fit_mate_client/features/styling_condition/model/styling_conditi
 class StylingConditionViewModel extends ChangeNotifier {
   // Display order for the category chips. Korean labels map to OutfitPart via fromLabel().
   static const categoryOptions = ['상의', '하의', '아우터', '원피스', '신발', '모자'];
-  // Client-side only sort options; not sent to the server.
-  static const sortOptions = ['AI 추천순', '가격 낮은순', '인기순', '신상품'];
+  // Client-side only sort options; not sent to the server. Limited to fields the
+  // recommendation payload actually carries (order + price); popularity/newness
+  // aren't available from the API.
+  static const sortOptions = ['AI 추천순', '가격 낮은순', '가격 높은순'];
   static const minAllowedPrice = 0;
   // Each garment spans 0~500,000; total budget scales with selected parts.
   static const maxPricePerPart = 500000;
