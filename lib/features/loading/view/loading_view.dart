@@ -67,7 +67,9 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
 
     _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      // Matches the real fitting generation time (~25s) so the bar fills
+      // gradually instead of racing to 95% in a few seconds and stalling.
+      duration: const Duration(seconds: 30),
     )..forward();
     _progressAnim = Tween<double>(begin: 0.0, end: 0.95).animate(
       CurvedAnimation(
@@ -100,7 +102,6 @@ class _LoadingViewState extends State<LoadingView> with TickerProviderStateMixin
             items: widget.selectedProducts
                 .map(ResultItem.fromProduct)
                 .toList(),
-            autoSave: true,
           ),
         ),
       );

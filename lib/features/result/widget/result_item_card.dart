@@ -8,11 +8,13 @@ class ResultItemCard extends StatelessWidget {
     required this.item,
     required this.isHighlighted,
     required this.onTap,
+    this.onOpenLink,
   });
 
   final ResultItem item;
   final bool isHighlighted;
   final VoidCallback onTap;
+  final VoidCallback? onOpenLink;
 
   @override
   Widget build(BuildContext context) {
@@ -69,20 +71,27 @@ class ResultItemCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('🔗 ', style: TextStyle(fontSize: 11)),
-                Text(
-                  '${item.brand} ↗',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF9CA3AF),
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                  ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onOpenLink,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('🔗 ', style: TextStyle(fontSize: 11)),
+                    Text(
+                      '${item.brand} ↗',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF9CA3AF),
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),

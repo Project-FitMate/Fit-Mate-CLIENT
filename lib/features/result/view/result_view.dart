@@ -2,15 +2,13 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:fit_mate_client/core/constants/color_constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:fit_mate_client/features/result/model/result_item.dart';
 import 'package:fit_mate_client/features/result/viewmodel/result_viewmodel.dart';
 import 'package:fit_mate_client/features/result/widget/result_category_chips.dart';
 import 'package:fit_mate_client/features/result/widget/result_header.dart';
 import 'package:fit_mate_client/features/result/widget/result_item_card.dart';
 import 'package:fit_mate_client/features/result/widget/result_preview_card.dart';
-import 'package:fit_mate_client/features/saved/model/saved_fitting.dart';
-import 'package:fit_mate_client/features/saved/repository/saved_fitting_store.dart';
 import 'package:fit_mate_client/shared/widgets/zoomable_image_view.dart';
 
 class ResultView extends StatefulWidget {
@@ -18,14 +16,10 @@ class ResultView extends StatefulWidget {
     super.key,
     this.generatedImageBase64 = '',
     this.items = const <ResultItem>[],
-    this.autoSave = false,
   });
 
   final String generatedImageBase64;
   final List<ResultItem> items;
-  // True for a freshly generated result (auto-saved to the gallery on open).
-  // False when re-opening an already-saved fitting from the gallery.
-  final bool autoSave;
 
   @override
   State<ResultView> createState() => _ResultViewState();
@@ -46,21 +40,6 @@ class _ResultViewState extends State<ResultView> {
         _decodedImage = null;
       }
     }
-    if (widget.autoSave && _decodedImage != null) {
-      _saveToGallery();
-    }
-  }
-
-  Future<void> _saveToGallery() async {
-    final now = DateTime.now();
-    await SavedFittingStore().save(
-      SavedFitting(
-        id: now.microsecondsSinceEpoch.toString(),
-        createdAt: now,
-        imageBase64: widget.generatedImageBase64,
-        items: widget.items,
-      ),
-    );
   }
 
   void _openZoom() {
@@ -71,6 +50,18 @@ class _ResultViewState extends State<ResultView> {
         builder: (_) => ZoomableImageView(imageBytes: _decodedImage!),
       ),
     );
+  }
+
+  // Open the product page in the external browser / shopping app.
+  Future<void> _openProduct(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null || url.isEmpty) return;
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('링크를 열 수 없습니다.')),
+      );
+    }
   }
 
   @override
@@ -90,21 +81,23 @@ class _ResultViewState extends State<ResultView> {
             return CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: ResultHeader(onRegenerate: () {}),
+                  child: ResultHeader(
+                    onRegenerate: () => Navigator.of(context).maybePop(),
+                  ),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: ResultPreviewCard(
                       generatedImage: _decodedImage,
-                      onRegenerate: () {},
+                      onRegenerate: () => Navigator.of(context).maybePop(),
                       onTapImage: _openZoom,
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: _buildTabs()),
                 SliverToBoxAdapter(
                   child: ResultCategoryChips(
+                    availableParts: _viewModel.availableParts,
                     selectedCategory: _viewModel.selectedCategory,
                     onSelect: _viewModel.selectCategory,
                   ),
@@ -117,26 +110,6 @@ class _ResultViewState extends State<ResultView> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildTabs() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-      child: Row(
-        children: [
-          _Tab(
-            label: '✓  착용 아이템',
-            isSelected: _viewModel.selectedTab == ResultTab.wearingItems,
-            onTap: () => _viewModel.selectTab(ResultTab.wearingItems),
-          ),
-          _Tab(
-            label: '✨  추천 카테고리',
-            isSelected: _viewModel.selectedTab == ResultTab.recommendations,
-            onTap: () => _viewModel.selectTab(ResultTab.recommendations),
-          ),
-        ],
       ),
     );
   }
@@ -172,6 +145,9 @@ class _ResultViewState extends State<ResultView> {
             item: item,
             isHighlighted: _viewModel.isItemSelected(item.id),
             onTap: () => _viewModel.toggleItem(item.id),
+            onOpenLink: item.productUrl.isEmpty
+                ? null
+                : () => _openProduct(item.productUrl),
           );
         },
         childCount: items.length,
@@ -180,43 +156,3 @@ class _ResultViewState extends State<ResultView> {
   }
 }
 
-class _Tab extends StatelessWidget {
-  const _Tab({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isSelected ? ColorConstants.coral : const Color(0xFFE5E7EB),
-                width: isSelected ? 2 : 1,
-              ),
-            ),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: isSelected ? ColorConstants.coral : const Color(0xFF9CA3AF),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
